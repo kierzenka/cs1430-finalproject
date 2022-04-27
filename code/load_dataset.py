@@ -2,6 +2,7 @@ import tensorflow as tf
 import hyperparameters as hp
 import re
 import numpy as np
+import matplotlib.pyplot as plt
 
 class TreepediaData(): 
     """Class for containing the training and testing sets"""
@@ -16,9 +17,13 @@ class TreepediaData():
         self.test_data = self.test_data.map(self.process_file_line,
                                         num_parallel_calls=tf.data.AUTOTUNE)
 
-        for image, label in self.train_data.take(1):
-            print("Image shape: ", image.numpy().shape)
-            print("Label: ", label.numpy().shape)
+        plt.figure(figsize=(10, 10))
+        for images, labels in self.train_data.take(1):
+            for i in range(9):
+                ax = plt.subplot(3, 3, i + 1)
+                plt.imsave("test", images[i].numpy().astype("uint8"))
+                plt.title("test")
+                plt.axis("off")
     
     def read_filepaths_txt(self, filename): 
         '''
