@@ -15,8 +15,9 @@ import hyperparameters as hp
 from models import YourModel
 from load_dataset import TreepediaDataset
 from skimage.transform import resize
-from tensorboard_utils import \
-        ImageLabelingLogger, ConfusionMatrixLogger, CustomModelSaver
+# from tensorboard_utils import \
+#         ImageLabelingLogger, ConfusionMatrixLogger, CustomModelSaver
+from tensorboard_utils import CustomModelSaver
 
 from skimage.io import imread
 from lime import lime_image
@@ -169,13 +170,9 @@ def train(model, datasets, checkpoint_path, logs_path, init_epoch):
             log_dir=logs_path,
             update_freq='batch',
             profile_batch=0),
-        ImageLabelingLogger(logs_path, datasets),
-        CustomModelSaver(checkpoint_path, ARGS.task, hp.max_num_weights)
+        # ImageLabelingLogger(logs_path, datasets),
+        CustomModelSaver(checkpoint_path, hp.max_num_weights)
     ]
-
-    # Include confusion logger in callbacks if flag set
-    if ARGS.confusion:
-        callback_list.append(ConfusionMatrixLogger(logs_path, datasets))
 
     # Begin training
     model.fit(
