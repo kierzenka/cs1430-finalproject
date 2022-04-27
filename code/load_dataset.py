@@ -18,7 +18,7 @@ class TreepediaData():
 
         for image, label in self.train_data.take(1):
             print("Image shape: ", image.numpy())
-            print("Label: ", label.numpy())
+            print("Label: ", np.unique(label.numpy()))
     
     def read_filepaths_txt(self, filename): 
         '''
