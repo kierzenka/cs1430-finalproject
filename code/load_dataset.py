@@ -11,7 +11,7 @@ class TreepediaDataset():
     def __init__(self, data_path): 
         self.data_path = data_path
 
-        self.train_ds, self.test_ds = self.get_data()
+        self.train_data, self.test_data = self.get_data()
         
 
         plt.figure(figsize=(10, 10))
