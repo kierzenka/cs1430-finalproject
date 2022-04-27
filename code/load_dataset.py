@@ -1,6 +1,7 @@
 from sklearn.feature_extraction import img_to_graph
 import tensorflow as tf
 import hyperparameters as hp
+import re
 
 class TreepediaData(): 
     """Class for containing the training and testing sets"""
@@ -20,7 +21,7 @@ class TreepediaData():
         label_list = []
         with open(filename, "r") as f:
             for line in f:
-                img_label_list = line.strip().split()
+                img_label_list = re.findall(r'\.\/[\w\_\/ ]+\.jpg', line)
                 img_list += img_label_list[0]
                 label_list += img_label_list[1]
         
