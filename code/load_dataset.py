@@ -20,9 +20,9 @@ class TreepediaData():
 
         plt.figure(figsize=(10, 10))
         for image, label in self.train_data.take(1):
-            plt.imsave("image_test.jpg", image.numpy().astype("uint8"))
+            plt.imsave("image_test.jpg", image.numpy())
             plt.axis("off")
-            plt.imsave("label_test.jpg", label.numpy().astype("uint8"))
+            plt.imsave("label_test.jpg", label.numpy())
     
     def read_filepaths_txt(self, filename): 
         '''
