@@ -53,7 +53,7 @@ class TreepediaData():
         
         return dataset 
 
-    def parse_image()
+    # def parse_image()
 
 def main():
     dataset_obj = TreepediaData("")
