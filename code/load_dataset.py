@@ -21,9 +21,8 @@ class TreepediaData():
         with open(filename, "r") as f:
             for line in f:
                 img_label_list = line.strip().split()
-                img_list = img_label_list[0]
-                label_list = img_label_list[1]
-        print((img_list, label_list))
+                img_list =+ img_label_list[0]
+                label_list =+ img_label_list[1]
         return (img_list, label_list)
 
     def get_data(self, train_or_test): 
