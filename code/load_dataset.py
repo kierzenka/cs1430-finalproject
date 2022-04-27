@@ -22,8 +22,8 @@ class TreepediaData():
         with open(filename, "r") as f:
             for line in f:
                 img_label_list = re.findall(r'\.\/[\w\_\/ ]+\.jpg', line)
-                img_list += img_label_list[0]
-                label_list += img_label_list[1]
+                img_list.append(img_label_list[0])
+                label_list.append(img_label_list[1])
                 print(img_list)
         
         print(len(img_list), len(label_list))
