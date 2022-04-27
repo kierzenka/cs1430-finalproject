@@ -3,6 +3,7 @@ import hyperparameters as hp
 import re
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 
 class TreepediaData(): 
     """Class for containing the training and testing sets"""
@@ -27,14 +28,6 @@ class TreepediaData():
         '''
         Reads in dataset as list of filepaths
         '''
-        # file_list = []
-
-        # with open(filename, "r") as f:
-        #     for line in f:
-        #         file_list.append(line.strip())
-
-        # return len(file_list), tf.constant(file_list)
-
         img_list = []
         label_list = []
         with open(filename, "r") as f:
@@ -57,6 +50,9 @@ class TreepediaData():
         '''
         image_count, images, labels = self.read_filepaths_txt(self.data_path)
 
+        test_image = Image.open(images[0])
+        print(test_image.size)
+        
         # images not loaded yet, just file paths
         list_ds = tf.data.Dataset.from_tensor_slices((images, labels))
         # shuffle 
