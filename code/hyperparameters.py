@@ -31,8 +31,8 @@ img_size = 224
 """
 Image height and width for resizinn
 """
-img_height = 300
-img_width = 600
+img_height = 224
+img_width = 224
 
 """
 Sample size for calculating the mean and standard deviation of the
