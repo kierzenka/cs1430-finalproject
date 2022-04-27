@@ -25,7 +25,7 @@ class TreepediaData():
                 img_list.append(img_label_list[0])
                 label_list.append(img_label_list[1])
 
-        return (tf.constant(img_list), tf.constant(label_list))
+        return (tf.convert_to_tensor(img_list), tf.convert_to_tensor(label_list))
 
     def get_data(self, train_or_test): 
         path = "data/sample_text_training.txt"
