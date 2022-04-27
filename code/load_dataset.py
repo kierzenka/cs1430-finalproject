@@ -77,6 +77,7 @@ class TreepediaData():
         else: 
             img = tf.io.decode_jpeg(img, channels=3)
         # Resize the image to the desired size
+        print(img.numpy().shape)
         return tf.image.resize(img, [hp.img_height, hp.img_width])
 
     def process_file_line(self, img_path, label_path):
