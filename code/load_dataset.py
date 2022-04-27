@@ -24,7 +24,7 @@ class TreepediaData():
 
     def get_data(self, train_or_test): 
         path = "data/sample_text_training.txt"
-        dataset = tf.data.TextLineDataset(self.read_filepaths_txt(path))
+        dataset = tf.data.Dataset.from_tensors(self.read_filepaths_txt(path))
         for line in dataset.take(5): 
             print(line)
         return dataset 
