@@ -43,7 +43,7 @@ class TreepediaData():
         for reference: 
         https://github.com/PacktPublishing/What-s-New-in-TensorFlow-2.0/blob/master/Chapter03/cifar10/cifar10_data_prep.py 
         '''
-        image_count, file_list = self.read_filepaths_txt(path)
+        image_count, file_list = self.read_filepaths_txt(self.data_path)
 
         # images not loaded yet
         list_ds = tf.data.Dataset.from_tensor_slices(file_list)
