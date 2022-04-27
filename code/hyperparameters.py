@@ -29,6 +29,14 @@ so that is hard-coded elsewhere.
 img_size = 224
 
 """
+Image height and width for resizinn
+"""
+img_width = 224
+img_height = 224
+
+
+
+"""
 Sample size for calculating the mean and standard deviation of the
 training data. This many images will be randomly seleted to be read
 into memory temporarily.
@@ -57,4 +65,4 @@ num_classes = 15
 A float between 0 and 1 the represents the fraction of data to 
 reserve for validation.
 """
-validation_split = 0.2
+val_split = 0.2

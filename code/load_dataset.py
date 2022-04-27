@@ -15,20 +15,28 @@ class TreepediaData():
     
     def read_filepaths_txt(self, filename): 
         '''
-        Reads in dataset
+        Reads in dataset as list of filepaths
         '''
-        img_list = []
-        label_list = []
+        file_list = []
+
         with open(filename, "r") as f:
             for line in f:
-                img_label_list = re.findall(r'\.\/[\w\_\/ ]+\.jpg', line)
-                img_list.append(img_label_list[0])
-                label_list.append(img_label_list[1])
+                file_list.append(line.strip())
 
-        return  (len(img_list),
-                 tf.convert_to_tensor(img_list), 
-                 tf.convert_to_tensor(label_list),
-                ) 
+        return len(file_list), tf.constant(file_list)
+
+        # img_list = []
+        # label_list = []
+        # with open(filename, "r") as f:
+        #     for line in f:
+        #         img_label_list = re.findall(r'\.\/[\w\_\/ ]+\.jpg', line)
+        #         img_list.append(img_label_list[0])
+        #         label_list.append(img_label_list[1])
+
+        # return  (len(img_list),
+        #          tf.convert_to_tensor(img_list), 
+        #          tf.convert_to_tensor(label_list),
+        #         ) 
 
     def get_data(self, train_or_test): 
         '''
@@ -39,22 +47,33 @@ class TreepediaData():
         '''
         path = "data/sample_text_training.txt"
 
-        image_count, images, labels = self.read_filepaths_txt(path)
-        print(image_count)
+        image_count, file_list = self.read_filepaths_txt(path)
 
         # images not loaded yet, just filepaths
-        list_ds = tf.data.Dataset.from_tensor_slices((images, labels))
+        list_ds = tf.data.Dataset.from_tensor_slices(file_list, 
+                                                     shuffle=False)
         # shuffle 
-        list_ds = list_ds.shuffle()
+        list_ds = list_ds.shuffle(image_count, reshuffle_each_iteration=False)
 
-        if train_or_test == "train": 
-            # creates batches
-            dataset = dataset.shuffle(1000).batch(hp.batch_size)
-            dataset = dataset.repeat(hp.num_epochs)
+        for f in list_ds.take(5):
+            print(f.numpy())
+
+        # split the dataset into training and test sets
+        val_size = int(image_count * hp.val_split)
+        train_ds = list_ds.skip(val_size)
+        test_ds = list_ds.take(val_size)
         
         return dataset 
 
-    # def parse_image()
+    
+    def decode_image(img): 
+        # Convert the compressed string to a 3D uint8 tensor
+        img = tf.io.decode_jpeg(img, channels=3)
+        # Resize the image to the desired size
+        return tf.image.resize(img, [hp.img_height, hp.img_width])
+
+    def process_path(file_path):
+        
 
 def main():
     dataset_obj = TreepediaData("")
