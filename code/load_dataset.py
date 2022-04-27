@@ -21,7 +21,7 @@ class TreepediaData():
         for images, labels in self.train_data.take(1):
             for i in range(9):
                 ax = plt.subplot(3, 3, i + 1)
-                plt.imsave("test", images[i].numpy().astype("uint8"))
+                plt.imsave("test.jpg", images[i].numpy().astype("uint8"))
                 plt.title("test")
                 plt.axis("off")
     
