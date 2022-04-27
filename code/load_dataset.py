@@ -50,8 +50,7 @@ class TreepediaData():
         image_count, file_list = self.read_filepaths_txt(path)
 
         # images not loaded yet, just filepaths
-        list_ds = tf.data.Dataset.from_tensor_slices(file_list, 
-                                                     shuffle=False)
+        list_ds = tf.data.Dataset.from_tensor_slices(file_list)
         # shuffle 
         list_ds = list_ds.shuffle(image_count, reshuffle_each_iteration=False)
 
