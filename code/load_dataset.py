@@ -10,8 +10,21 @@ class TreepediaData():
         self.train_data = self.get_data("train")
         self.test_data = self.get_data("test")
 
+    
+    def read_filepaths_txt(self, filename): 
+        '''
+        Reads in dataset
+        '''
+        img_label_tuples = []
+        with open(filename, "r") as f:
+            for line in f:
+                img_label_list = line.strip().split()
+                img_label_tuples += (img_label_list[0], img_label_list[1])
+        return img_label_tuples
+
     def get_data(self, train_or_test): 
-        dataset = tf.data.TextLineDataset("data/sample_text_training.txt")
+        path = "data/sample_text_training.txt"
+        dataset = tf.data.TextLineDataset(self.read_filepaths_txt(path))
         for line in dataset.take(5): 
             print(line)
         return dataset 

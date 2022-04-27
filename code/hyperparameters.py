@@ -52,3 +52,9 @@ batch_size = 4
 The number of image scene classes. Don't change this.
 """
 num_classes = 15
+
+"""
+A float between 0 and 1 the represents the fraction of data to 
+reserve for validation.
+"""
+validation_split = 0.2

@@ -79,6 +79,6 @@ class Datasets():
             )
 
 
-        return data_gen
+        return train_data, test_data
 
         
