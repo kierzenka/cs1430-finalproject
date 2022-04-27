@@ -50,9 +50,11 @@ class TreepediaData():
         '''
         image_count, images, labels = self.read_filepaths_txt(self.data_path)
 
-        test_image = Image.open(images[0])
-        print(test_image.size)
-        
+        test_image = tf.io.read_file(images[0])
+        test_image = tf.io.decode_jpeg(test_img, channels=3)
+        print(test_image.numpy().shape)
+
+
         # images not loaded yet, just file paths
         list_ds = tf.data.Dataset.from_tensor_slices((images, labels))
         # shuffle 
@@ -73,12 +75,12 @@ class TreepediaData():
         else: 
             img = tf.io.decode_jpeg(img, channels=3)
         # Resize the image to the desired size
-        print(img.numpy().shape)
         return tf.image.resize(img, [hp.img_height, hp.img_width])
 
     def process_file_line(self, img_path, label_path):
         # Load the raw data from the file as a string
         label = tf.io.read_file(label_path)
+        # TODO: double check how to hand grayscale
         label = self.decode_image(label, grayscale=False)
         
         img = tf.io.read_file(img_path)
