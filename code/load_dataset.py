@@ -18,7 +18,7 @@ class TreepediaData():
 
         for image, label in self.train_data.take(1):
             print("Image shape: ", image.numpy())
-            print("Label: ", label.numpy().shape)
+            print("Label: ", label.numpy())
     
     def read_filepaths_txt(self, filename): 
         '''
@@ -68,7 +68,7 @@ class TreepediaData():
 
     def decode_image(self, img): 
         # Convert the compressed string to a 3D uint8 tensor
-        img = tf.io.decode_jpeg(img, channels=3)
+        img = tf.io.decode_jpeg(img)
         # Resize the image to the desired size
         return tf.image.resize(img, [hp.img_height, hp.img_width])
 
