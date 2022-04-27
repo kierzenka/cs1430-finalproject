@@ -9,9 +9,7 @@ class TreepediaData():
     def __init__(self, data_path): 
         self.data_path = data_path
 
-        self.train_data = self.get_data("train")
-        self.test_data = self.get_data("test")
-
+        self.train_data, self.test_data = self.get_data()
     
     def read_filepaths_txt(self, filename): 
         '''
@@ -38,18 +36,16 @@ class TreepediaData():
         #          tf.convert_to_tensor(label_list),
         #         ) 
 
-    def get_data(self, train_or_test): 
+    def get_data(self): 
         '''
         Creates Dataset object for testing or training dataset 
 
         for reference: 
         https://github.com/PacktPublishing/What-s-New-in-TensorFlow-2.0/blob/master/Chapter03/cifar10/cifar10_data_prep.py 
         '''
-        path = "data/sample_text_training.txt"
-
         image_count, file_list = self.read_filepaths_txt(path)
 
-        # images not loaded yet, just filepaths
+        # images not loaded yet
         list_ds = tf.data.Dataset.from_tensor_slices(file_list)
         # shuffle 
         list_ds = list_ds.shuffle(image_count, reshuffle_each_iteration=False)
@@ -62,8 +58,8 @@ class TreepediaData():
         train_ds = list_ds.skip(val_size)
         test_ds = list_ds.take(val_size)
         
-        dataset = []
-        return dataset 
+        return train_ds, test_ds
+
     
     def decode_image(img): 
         # Convert the compressed string to a 3D uint8 tensor
@@ -79,11 +75,11 @@ class TreepediaData():
         label = tf.io.read_file(label_path)
         
         img = tf.io.read_file(img_path)
-        # img = decode_image()
+        img = decode_image(img)
         return img, label
 
 def main():
-    dataset_obj = TreepediaData("")
+    dataset_obj = TreepediaData("data/sample_text_training.txt")
 
 if __name__ == "__main__":
     main()
