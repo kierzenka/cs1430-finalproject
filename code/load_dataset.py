@@ -17,7 +17,7 @@ class TreepediaData():
                                         num_parallel_calls=tf.data.AUTOTUNE)
 
         for image, label in self.train_data.take(1):
-            print("Image shape: ", image.numpy().shape)
+            print("Image shape: ", image.numpy())
             print("Label: ", label.numpy().shape)
     
     def read_filepaths_txt(self, filename): 
