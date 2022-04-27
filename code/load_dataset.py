@@ -16,13 +16,13 @@ class TreepediaData():
         self.train_data = self.train_data.map(self.process_file_line,
                                               num_parallel_calls=tf.data.AUTOTUNE)
         self.test_data = self.test_data.map(self.process_file_line,
-                                        num_parallel_calls=tf.data.AUTOTUNE)
+                                            num_parallel_calls=tf.data.AUTOTUNE)
 
         plt.figure(figsize=(10, 10))
         for image, label in self.train_data.take(1):
             plt.imsave("image_test.jpg", image.numpy().astype("uint8"))
             plt.axis("off")
-            plt.imsave("label_test.jpg", image.numpy().astype("uint8"))
+            plt.imsave("label_test.jpg", label.numpy().astype("uint8"))
     
     def read_filepaths_txt(self, filename): 
         '''
@@ -70,7 +70,7 @@ class TreepediaData():
         else: 
             img = tf.io.decode_jpeg(img, channels=3)
         # Resize the image to the desired size
-        return tf.image.resize(img, [hp.img_height, hp.img_width])
+        return tf.image.resize(img / 255, [hp.img_height, hp.img_width])
 
     def process_file_line(self, img_path, label_path):
         # Load the raw data from the file as a string
