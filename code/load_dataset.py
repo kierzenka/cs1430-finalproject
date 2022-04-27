@@ -1,7 +1,7 @@
-from sklearn.feature_extraction import img_to_graph
 import tensorflow as tf
 import hyperparameters as hp
 import re
+import numpy as np
 
 class TreepediaData(): 
     """Class for containing the training and testing sets"""
@@ -25,13 +25,35 @@ class TreepediaData():
                 img_list.append(img_label_list[0])
                 label_list.append(img_label_list[1])
 
-        return (tf.convert_to_tensor(img_list), tf.convert_to_tensor(label_list))
+        return (tf.convert_to_tensor(img_list), 
+                tf.convert_to_tensor(label_list))
 
     def get_data(self, train_or_test): 
+        '''
+        Creates Dataset object for testing or training dataset 
+
+        for reference: 
+        https://github.com/PacktPublishing/What-s-New-in-TensorFlow-2.0/blob/master/Chapter03/cifar10/cifar10_data_prep.py 
+        '''
         path = "data/sample_text_training.txt"
-        dataset = tf.data.Dataset.from_tensor_slices(self.read_filepaths_txt(path))
-        print(dataset)
+
+        images, labels = self.read_filepaths_txt(path)
+        image_count = tf.shape(images)[0]
+        print(image_count)
+
+        # images not loaded yet, just filepaths
+        list_ds = tf.data.Dataset.from_tensor_slices((images, labels))
+        # shuffle 
+        list_ds = list_ds.shuffle()
+
+        if train_or_test == "train": 
+            # creates batches
+            dataset = dataset.shuffle(1000).batch(hp.batch_size)
+            dataset = dataset.repeat(hp.num_epochs)
+        
         return dataset 
+
+    def parse_image()
 
 def main():
     dataset_obj = TreepediaData("")
