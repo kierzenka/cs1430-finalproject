@@ -11,7 +11,7 @@ class TreepediaData():
         self.test_data = self.get_data("test")
 
     def get_data(self, train_or_test): 
-        dataset = tf.data.TextLineDataset("code/data/sample_text_training.txt")
+        dataset = tf.data.TextLineDataset("/data/sample_text_training.txt")
         for line in dataset.take(5): 
             print(line)
         return dataset 
