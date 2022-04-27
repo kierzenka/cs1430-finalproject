@@ -1,7 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.layers import \
     Conv2D, MaxPool2D, Dropout, Flatten, Dense
-
 import hyperparameters as hp
 
 
@@ -14,7 +13,7 @@ class YourModel(tf.keras.Model):
         self.optimizer =tf.keras.optimizers.RMSprop(learning_rate=hp.learning_rate, momentum=hp.momentum)
 
         self.resnet_preprocess = tf.keras.applications.resnet.preprocess_input
-        self.resnet = tf.keras.applications.resnet50.ResNet5(weights='imagenet')
+        self.resnet = tf.keras.applications.resnet50.ResNet50(weights='imagenet')
 
         # From the research paper: https://arxiv.org/pdf/1808.04754.pdf 
         # Using a 50 layered ResNet as the
