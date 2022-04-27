@@ -24,8 +24,8 @@ class TreepediaData():
                 img_label_list = re.findall(r'\.\/[\w\_\/ ]+\.jpg', line)
                 img_list.append(img_label_list[0])
                 label_list.append(img_label_list[1])
-                print(img_list)
-    
+
+        print(tf.constant(img_list))
         return (tf.constant(img_list), tf.constant(label_list))
 
     def get_data(self, train_or_test): 
