@@ -25,14 +25,12 @@ class TreepediaData():
                 img_list.append(img_label_list[0])
                 label_list.append(img_label_list[1])
 
-        print(tf.constant(img_list))
         return (tf.constant(img_list), tf.constant(label_list))
 
     def get_data(self, train_or_test): 
         path = "data/sample_text_training.txt"
         dataset = tf.data.Dataset.from_tensor_slices(self.read_filepaths_txt(path))
-        for line in dataset.take(5): 
-            print(line)
+        print(dataset)
         return dataset 
 
 def main():
