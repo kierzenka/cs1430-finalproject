@@ -51,7 +51,7 @@ class TreepediaData():
         image_count, images, labels = self.read_filepaths_txt(self.data_path)
 
         test_image = tf.io.read_file(images[0])
-        test_image = tf.io.decode_jpeg(test_img, channels=3)
+        test_image = tf.io.decode_jpeg(test_image, channels=3)
         print(test_image.numpy().shape)
 
 
