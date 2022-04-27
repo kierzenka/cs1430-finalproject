@@ -23,6 +23,7 @@ class TreepediaData():
                 img_label_list = line.strip().split()
                 img_list = img_label_list[0]
                 label_list = img_label_list[1]
+        print((img_list, label_list))
         return (img_list, label_list)
 
     def get_data(self, train_or_test): 
