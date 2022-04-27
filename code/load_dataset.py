@@ -20,9 +20,9 @@ class TreepediaData():
 
         plt.figure(figsize=(10, 10))
         for image, label in self.train_data.take(1):
-            plt.imsave("test.jpg", label.numpy().astype("uint8"))
-            plt.title("label")
+            plt.imsave("image_test.jpg", image.numpy().astype("uint8"))
             plt.axis("off")
+            plt.imsave("label_test.jpg", image.numpy().astype("uint8"))
     
     def read_filepaths_txt(self, filename): 
         '''
@@ -49,11 +49,6 @@ class TreepediaData():
         https://github.com/PacktPublishing/What-s-New-in-TensorFlow-2.0/blob/master/Chapter03/cifar10/cifar10_data_prep.py 
         '''
         image_count, images, labels = self.read_filepaths_txt(self.data_path)
-
-        test_image = tf.io.read_file(images[0])
-        test_image = tf.io.decode_jpeg(test_image, channels=3)
-        print(test_image.numpy().shape)
-
 
         # images not loaded yet, just file paths
         list_ds = tf.data.Dataset.from_tensor_slices((images, labels))
