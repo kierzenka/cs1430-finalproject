@@ -82,7 +82,7 @@ class TreepediaData():
     def process_file_line(self, img_path, label_path):
         # Load the raw data from the file as a string
         label = tf.io.read_file(label_path)
-        label = self.decode_image(label, grayscale=True)
+        label = self.decode_image(label, grayscale=False)
         
         img = tf.io.read_file(img_path)
         img = self.decode_image(img, grayscale=False)
