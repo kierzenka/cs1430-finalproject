@@ -1,3 +1,4 @@
+from sklearn.feature_extraction import img_to_graph
 import tensorflow as tf
 import hyperparameters as hp
 
@@ -15,13 +16,14 @@ class TreepediaData():
         '''
         Reads in dataset
         '''
-        img_label_tuples = []
+        img_list = []
+        label_list = []
         with open(filename, "r") as f:
             for line in f:
                 img_label_list = line.strip().split()
-                print((img_label_list[0], img_label_list[1]))
-                img_label_tuples += (img_label_list[0], img_label_list[1])
-        return img_label_tuples
+                img_list = img_label_list[0]
+                label_list = img_label_list[1]
+        return (img_list, label_list)
 
     def get_data(self, train_or_test): 
         path = "data/sample_text_training.txt"
