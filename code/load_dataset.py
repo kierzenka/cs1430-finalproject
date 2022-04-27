@@ -5,23 +5,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 
-class TreepediaData(): 
+class TreepediaDataset(): 
     """Class for containing the training and testing sets"""
 
     def __init__(self, data_path): 
         self.data_path = data_path
 
-        self.train_data, self.test_data = self.get_data()
-
-        self.train_data = self.train_data.map(self.process_file_line,
-                                              num_parallel_calls=tf.data.AUTOTUNE)
-        self.test_data = self.test_data.map(self.process_file_line,
-                                            num_parallel_calls=tf.data.AUTOTUNE)
+        self.train_ds, self.test_ds = self.get_data()
+        
 
         plt.figure(figsize=(10, 10))
         for image, label in self.train_data.take(1):
-            print(image.numpy())
-            print(label.numpy())
             plt.imsave("image_test.jpg", image.numpy())
             plt.axis("off")
             plt.imsave("label_test.jpg", label.numpy())
@@ -61,7 +55,22 @@ class TreepediaData():
         val_size = int(image_count * hp.val_split)
         train_ds = list_ds.skip(val_size)
         test_ds = list_ds.take(val_size)
-        
+
+        # conver to timages
+        train_ds = train_ds.map(self.process_file_line,
+                                num_parallel_calls=tf.data.AUTOTUNE)
+        test_ds = test_ds.map(self.process_file_line,
+                              num_parallel_calls=tf.data.AUTOTUNE)
+
+        # shuffle data again
+        # TODO: change batch size?
+        train_ds = train_ds.shuffle(buffer_size=10 * hp.batch_size)
+        # repeat and batch
+        train_ds = train_ds.repeat(hp.num_epochs).batch(hp.batch_size)
+        #
+        train_ds = train_ds.prefetch(tf.data.AUTOTUNE)
+        test_ds = test_ds.prefetch(tf.data.AUTOTUNE)
+
         return train_ds, test_ds
 
     def decode_image(self, img, grayscale): 
@@ -85,6 +94,6 @@ class TreepediaData():
         return img, label
 
 def main():
-    dataset_obj = TreepediaData("data/sample_text_training.txt")
+    dataset_obj = TreepediaDataset("data/sample_text_training.txt")
 
 main()

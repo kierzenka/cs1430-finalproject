@@ -13,7 +13,7 @@ import tensorflow as tf
 
 import hyperparameters as hp
 from models import YourModel, VGGModel
-from preprocess import Datasets
+from load_dataset import TreepediaDataset
 from skimage.transform import resize
 from tensorboard_utils import \
         ImageLabelingLogger, ConfusionMatrixLogger, CustomModelSaver
@@ -29,25 +29,13 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 def parse_args():
     """ Perform command-line argument parsing. """
-
     parser = argparse.ArgumentParser(
         description="Let's train some neural nets!",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
-        '--task',
-        required=True,
-        choices=['1', '3'],
-        help='''Which task of the assignment to run -
-        training from scratch (1), or fine tuning VGG-16 (3).''')
-    parser.add_argument(
         '--data',
         default='..'+os.sep+'data'+os.sep,
         help='Location where the dataset is stored.')
-    parser.add_argument(
-        '--load-vgg',
-        default='vgg16_imagenet.h5',
-        help='''Path to pre-trained VGG-16 file (only applicable to
-        task 3).''')
     parser.add_argument(
         '--load-checkpoint',
         default=None,
@@ -55,12 +43,6 @@ def parse_args():
         extension .h5). Checkpoints are automatically saved when you
         train your model. If you want to continue training from where
         you left off, this is how you would load your weights.''')
-    parser.add_argument(
-        '--confusion',
-        action='store_true',
-        help='''Log a confusion matrix at the end of each
-        epoch (viewable in Tensorboard). This is turned off
-        by default as it takes a little bit of time to complete.''')
     parser.add_argument(
         '--evaluate',
         action='store_true',
@@ -244,39 +226,23 @@ def main():
     # Run script from location of run.py
     os.chdir(sys.path[0])
 
-    datasets = Datasets(ARGS.data, ARGS.task)
+    datasets = TreepediaDataset(ARGS.data)
 
-    if ARGS.task == '1':
-        model = YourModel()
-        model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
-        checkpoint_path = "checkpoints" + os.sep + \
-            "your_model" + os.sep + timestamp + os.sep
-        logs_path = "logs" + os.sep + "your_model" + \
-            os.sep + timestamp + os.sep
+   
+    model = YourModel()
+    model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
+    checkpoint_path = "checkpoints" + os.sep + \
+        "your_model" + os.sep + timestamp + os.sep
+    logs_path = "logs" + os.sep + "your_model" + \
+        os.sep + timestamp + os.sep
 
-        # Print summary of model
-        model.summary()
-    else:
-        model = VGGModel()
-        checkpoint_path = "checkpoints" + os.sep + \
-            "vgg_model" + os.sep + timestamp + os.sep
-        logs_path = "logs" + os.sep + "vgg_model" + \
-            os.sep + timestamp + os.sep
-        model(tf.keras.Input(shape=(224, 224, 3)))
-
-        # Print summaries for both parts of the model
-        model.vgg16.summary()
-        model.head.summary()
-
-        # Load base of VGG model
-        model.vgg16.load_weights(ARGS.load_vgg, by_name=True)
+    # Print summary of model
+    model.summary()
 
     # Load checkpoints
     if ARGS.load_checkpoint is not None:
-        if ARGS.task == '1':
-            model.load_weights(ARGS.load_checkpoint, by_name=False)
-        else:
-            model.head.load_weights(ARGS.load_checkpoint, by_name=False)
+        model.load_weights(ARGS.load_checkpoint, by_name=False)
+
 
     # Make checkpoint directory if needed
     if not ARGS.evaluate and not os.path.exists(checkpoint_path):
