@@ -13,7 +13,7 @@ class TreepediaData():
 
         self.train_data = self.train_data.map(self.process_file_line,
                                               num_parallel_calls=tf.data.AUTOTUNE)
-        self.test_data = self.test_data(self.process_file_line,
+        self.test_data = self.test_data.map(self.process_file_line,
                                         num_parallel_calls=tf.data.AUTOTUNE)
 
         for image, label in self.train_data.take(1):
