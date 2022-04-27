@@ -76,6 +76,8 @@ class TreepediaData():
         return tf.image.resize(img, [hp.img_height, hp.img_width])
 
     def process_file_line(self, file_line):
+        print(file_line)
+        print(file_line.numpy())
         img_label_list = re.findall(r'\.\/[\w\_\/ ]+\.jpg', file_line)
         img_path, label_path = img_label_list[0], img_label_list[1]
         # Load the raw data from the file as a string
