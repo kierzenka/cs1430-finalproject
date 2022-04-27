@@ -19,7 +19,7 @@ class TreepediaData():
 
         plt.figure(figsize=(10, 10))
         for image, label in self.train_data.take(1):
-            plt.imsave("test.jpg", image.numpy().astype("uint8"))
+            plt.imsave("test.jpg", label.numpy().astype("uint8"))
             plt.title("label")
             plt.axis("off")
     
