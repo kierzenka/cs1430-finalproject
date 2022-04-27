@@ -12,7 +12,7 @@ class TreepediaData():
         self.train_data, self.test_data = self.get_data()
 
         self.train_data = self.train_data.map(self.process_file_line,
-                                              num_parallel_callsß=tf.data.AUTOTUNE)
+                                              num_parallel_calls=tf.data.AUTOTUNE)
         self.test_data = self.test_data(self.process_file_line,
                                         num_parallel_calls=tf.data.AUTOTUNE)
 
