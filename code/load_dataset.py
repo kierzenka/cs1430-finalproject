@@ -68,10 +68,11 @@ class TreepediaData():
 
     def decode_image(self, img, grayscale): 
         # Convert the compressed string to a 3D uint8 tensor
-        if grayscale: 
-            img = tf.io.decode_jpeg(img, channels=1)
-        else: 
-            img = tf.io.decode_jpeg(img, channels=3)
+        img = tf.io.decode_jpeg(img, channels=3)
+        # if grayscale: 
+        #     img = tf.io.decode_jpeg(img, channels=1)
+        # else: 
+        #     img = tf.io.decode_jpeg(img, channels=3)
         # Resize the image to the desired size
         return tf.image.resize(img, [hp.img_height, hp.img_width])
 
