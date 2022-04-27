@@ -217,8 +217,6 @@ def main():
     # set relative to the directory of run.py
     if os.path.exists(ARGS.data):
         ARGS.data = os.path.abspath(ARGS.data)
-    if os.path.exists(ARGS.load_vgg):
-        ARGS.load_vgg = os.path.abspath(ARGS.load_vgg)
 
     # Run script from location of run.py
     os.chdir(sys.path[0])
