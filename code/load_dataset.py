@@ -24,26 +24,26 @@ class TreepediaData():
         '''
         Reads in dataset as list of filepaths
         '''
-        file_list = []
+        # file_list = []
 
-        with open(filename, "r") as f:
-            for line in f:
-                file_list.append(line.strip())
-
-        return len(file_list), tf.constant(file_list)
-
-        # img_list = []
-        # label_list = []
         # with open(filename, "r") as f:
         #     for line in f:
-        #         img_label_list = re.findall(r'\.\/[\w\_\/ ]+\.jpg', line)
-        #         img_list.append(img_label_list[0])
-        #         label_list.append(img_label_list[1])
+        #         file_list.append(line.strip())
 
-        # return  (len(img_list),
-        #          tf.convert_to_tensor(img_list), 
-        #          tf.convert_to_tensor(label_list),
-        #         ) 
+        # return len(file_list), tf.constant(file_list)
+
+        img_list = []
+        label_list = []
+        with open(filename, "r") as f:
+            for line in f:
+                img_label_list = re.findall(r'\.\/[\w\_\/ ]+\.jpg', line)
+                img_list.append(img_label_list[0])
+                label_list.append(img_label_list[1])
+
+        return  (len(img_list),
+                 tf.convert_to_tensor(img_list), 
+                 tf.convert_to_tensor(label_list),
+                ) 
 
     def get_data(self): 
         '''
@@ -52,15 +52,12 @@ class TreepediaData():
         for reference: 
         https://github.com/PacktPublishing/What-s-New-in-TensorFlow-2.0/blob/master/Chapter03/cifar10/cifar10_data_prep.py 
         '''
-        image_count, file_list = self.read_filepaths_txt(self.data_path)
+        image_count, images, labels = self.read_filepaths_txt(self.data_path)
 
-        # images not loaded yet
-        list_ds = tf.data.Dataset.from_tensor_slices(file_list)
+        # images not loaded yet, just file paths
+        list_ds = tf.data.Dataset.from_tensor_slices((images, labels))
         # shuffle 
         list_ds = list_ds.shuffle(image_count, reshuffle_each_iteration=False)
-
-        for f in list_ds.take(5):
-            print(f.numpy())
 
         # split the dataset into training and test sets
         val_size = int(image_count * hp.val_split)
@@ -75,13 +72,8 @@ class TreepediaData():
         # Resize the image to the desired size
         return tf.image.resize(img, [hp.img_height, hp.img_width])
 
-    def process_file_line(self, file_line):
-        print(file_line)
-        print(file_line.numpy())
-        img_label_list = re.findall(r'\.\/[\w\_\/ ]+\.jpg', file_line)
-        img_path, label_path = img_label_list[0], img_label_list[1]
+    def process_file_line(self, img_path, label_path):
         # Load the raw data from the file as a string
-
         label = tf.io.read_file(label_path)
         label = self.decode_image(label)
         
