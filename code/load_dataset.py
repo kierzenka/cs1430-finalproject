@@ -17,8 +17,8 @@ class TreepediaData():
                                         num_parallel_calls=tf.data.AUTOTUNE)
 
         for image, label in self.train_data.take(1):
-            print("Image shape: ", image.numpy())
-            print("Label: ", np.unique(label.numpy()))
+            print("Image shape: ", image.numpy().shape)
+            print("Label: ", label.numpy().shape)
     
     def read_filepaths_txt(self, filename): 
         '''
@@ -70,7 +70,7 @@ class TreepediaData():
         # Convert the compressed string to a 3D uint8 tensor
         # img = tf.io.decode_jpeg(img, channels=3)
         if grayscale: 
-            img = tf.io.decode_jpeg(img, channels=0)
+            img = tf.io.decode_jpeg(img, channels=1)
         else: 
             img = tf.io.decode_jpeg(img, channels=3)
         # Resize the image to the desired size
