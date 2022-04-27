@@ -63,8 +63,8 @@ class TreepediaData():
         train_ds = list_ds.skip(val_size)
         test_ds = list_ds.take(val_size)
         
+        dataset = []
         return dataset 
-
     
     def decode_image(img): 
         # Convert the compressed string to a 3D uint8 tensor
@@ -72,10 +72,19 @@ class TreepediaData():
         # Resize the image to the desired size
         return tf.image.resize(img, [hp.img_height, hp.img_width])
 
-    def process_path(file_path):
+    def process_file_line(file_line):
+        img_label_list = re.findall(r'\.\/[\w\_\/ ]+\.jpg', file_line)
+        img_path, label_path = img_label_list[0], img_label_list[1]
+        # Load the raw data from the file as a string
+
+        label = tf.io.read_file(label_path)
         
+        img = tf.io.read_file(img_path)
+        # img = decode_image()
+        return img, label
 
 def main():
     dataset_obj = TreepediaData("")
 
-main()
+if __name__ == "__main__":
+    main()
