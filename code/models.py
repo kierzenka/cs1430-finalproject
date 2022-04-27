@@ -47,4 +47,4 @@ class YourModel(tf.keras.Model):
        # Using mean squared error will maximize the Pearson's correlation coefficient
        # https://stats.stackexchange.com/questions/301659/mse-as-a-proxy-to-pearsons-correlation-in-regression-problems 
        mse = tf.keras.losses.MeanSquaredError()
-       return mse(labels, predictions, from_logits=False)
+       return mse(labels, predictions)
