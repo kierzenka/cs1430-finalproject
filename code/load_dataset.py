@@ -73,6 +73,7 @@ class TreepediaData():
         # Load the raw data from the file as a string
 
         label = tf.io.read_file(label_path)
+        label = decode_image(label)
         
         img = tf.io.read_file(img_path)
         img = decode_image(img)
@@ -81,5 +82,4 @@ class TreepediaData():
 def main():
     dataset_obj = TreepediaData("data/sample_text_training.txt")
 
-if __name__ == "__main__":
-    main()
+main()
