@@ -28,9 +28,12 @@ class TreepediaDataset():
         label_list = []
         with open(filename, "r") as f:
             for line in f:
-                img_label_list = re.findall(r'\.\/[\w\_\/ ]+\.jpg', line)
-                img_list.append(img_label_list[0])
-                label_list.append(img_label_list[1])
+                line_info = line.split()
+                img_list.append(line_info[0])
+                label_list.append(float(line_info[1]))
+                # img_label_list = re.findall(r'\.\/[\w\_\/ ]+\.jpg', line)
+                # img_list.append(img_label_list[0])
+                # label_list.append(img_label_list[1])
 
         return  (len(img_list),
                  tf.convert_to_tensor(img_list), 
@@ -85,9 +88,11 @@ class TreepediaDataset():
 
     def process_file_line(self, img_path, label_path):
         # Load the raw data from the file as a string
-        label = tf.io.read_file(label_path)
+        #Filip 4/28: commented out the label stuff since they are just floats
+        # label = tf.io.read_file(label_path)
+        label = float(label_path)
         # TODO: double check how to hand grayscale
-        label = self.decode_image(label, grayscale=False)
+        # label = self.decode_image(label, grayscale=False)
         
         img = tf.io.read_file(img_path)
         img = self.decode_image(img, grayscale=False)
