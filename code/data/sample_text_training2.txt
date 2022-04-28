@@ -6,7 +6,7 @@
 ./cambridge_gsv/Cambridge_gsv_16.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_18.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_19.jpg 11.23
-./cambridge_gsv/Cambridge_gsv_2.jpg 
+./cambridge_gsv/Cambridge_gsv_2.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_21.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_24.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_25.jpg 11.23
@@ -14,13 +14,13 @@
 ./cambridge_gsv/Cambridge_gsv_27.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_28.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_29.jpg 11.23
-./cambridge_gsv/Cambridge_gsv_3.jpg 
+./cambridge_gsv/Cambridge_gsv_3.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_30.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_32.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_34.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_36.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_38.jpg 11.23
-./cambridge_gsv/Cambridge_gsv_4.jpg 
+./cambridge_gsv/Cambridge_gsv_4.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_41.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_43.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_45.jpg 11.23
@@ -32,7 +32,7 @@
 ./cambridge_gsv/Cambridge_gsv_54.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_55.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_57.jpg 11.23
-./cambridge_gsv/Cambridge_gsv_6.jpg 
+./cambridge_gsv/Cambridge_gsv_6.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_60.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_61.jpg 11.23
 ./cambridge_gsv/Cambridge_gsv_65.jpg 11.23

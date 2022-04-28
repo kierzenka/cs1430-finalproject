@@ -15,10 +15,10 @@ class TreepediaDataset():
         
 
         plt.figure(figsize=(10, 10))
-        for image, label in self.train_data.take(1):
-            plt.imsave("image_test.jpg", image.numpy())
-            plt.axis("off")
-            plt.imsave("label_test.jpg", label.numpy())
+        #for image, label in self.train_data.take(1):
+            #plt.imsave("image_test.jpg", image.numpy())
+            #plt.axis("off")
+            #plt.imsave("label_test.jpg", label.numpy())
     
     def read_filepaths_txt(self, filename): 
         '''
@@ -29,6 +29,8 @@ class TreepediaDataset():
         with open(filename, "r") as f:
             for line in f:
                 line_info = line.split()
+                print(line)
+                print(line_info)
                 img_list.append(line_info[0])
                 label_list.append(float(line_info[1]))
                 # img_label_list = re.findall(r'\.\/[\w\_\/ ]+\.jpg', line)
@@ -99,6 +101,6 @@ class TreepediaDataset():
         return img, label
 
 def main():
-    dataset_obj = TreepediaDataset("data/sample_text_training.txt")
+    dataset_obj = TreepediaDataset("data/sample_text_training2.txt")
 
 main()
