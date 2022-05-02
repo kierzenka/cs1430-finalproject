@@ -34,9 +34,13 @@ def parse_args():
         description="Let's train some neural nets!",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
-        '--data',
+        '--data-gsv',
         default='..'+os.sep+'data'+os.sep,
-        help='Location where the dataset is stored.')
+        help='Location where the gsv dataset is stored.')
+    parser.add_argument(
+        '--data-cityscapes',
+        default='..'+os.sep+'data'+os.sep,
+        help='Location where the cityscapes dataset is stored.')
     parser.add_argument(
         '--load-checkpoint',
         default=None,
@@ -216,12 +220,12 @@ def main():
     # ensure they are used. If not, these directories/files will be
     # set relative to the directory of run.py
     if os.path.exists(ARGS.data):
-        ARGS.data = os.path.abspath(ARGS.data)
+        ARGS.data_gsv = os.path.abspath(ARGS.data_gsv)
 
     # Run script from location of run.py
     os.chdir(sys.path[0])
 
-    datasets = TreepediaDataset(ARGS.data)
+    datasets = TreepediaDataset(ARGS.data_gsv, ARGS.data_cityscapes)
 
    
     model = YourModel()
