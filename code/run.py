@@ -219,7 +219,7 @@ def main():
     # If paths provided by program arguments are accurate, then this will
     # ensure they are used. If not, these directories/files will be
     # set relative to the directory of run.py
-    if os.path.exists(ARGS.data):
+    if os.path.exists(ARGS.data_gsv):
         ARGS.data_gsv = os.path.abspath(ARGS.data_gsv)
 
     # Run script from location of run.py
@@ -242,7 +242,6 @@ def main():
     if ARGS.load_checkpoint is not None:
         model.load_weights(ARGS.load_checkpoint, by_name=False)
 
-
     # Make checkpoint directory if needed
     if not ARGS.evaluate and not os.path.exists(checkpoint_path):
         os.makedirs(checkpoint_path)
@@ -259,7 +258,7 @@ def main():
         # TODO: change the image path to be the image of your choice by changing
         # the lime-image flag when calling run.py to investigate
         # i.e. python run.py --evaluate --lime-image test/Bedroom/image_003.jpg
-        path = ARGS.data + os.sep + ARGS.lime_image
+        path = ARGS.data_gsv + os.sep + ARGS.lime_image
         LIME_explainer(model, path, datasets.preprocess_fn)
     else:
         train(model, datasets, checkpoint_path, logs_path, init_epoch)
