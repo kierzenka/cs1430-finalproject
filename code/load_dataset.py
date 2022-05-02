@@ -106,3 +106,5 @@ class TreepediaDataset():
         # prefetch to increase efficiency
         train_ds = train_ds.prefetch(tf.data.AUTOTUNE)
         test_ds = test_ds.prefetch(tf.data.AUTOTUNE)
+
+        return train_ds, test_ds
