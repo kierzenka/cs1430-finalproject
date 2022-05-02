@@ -20,7 +20,7 @@ class TreepediaDataset():
         # get train + test set for combined dataset
         self.train_data, self.test_data = self.load_dataset(gsv_ds, scapes_ds)
 
-        plt.figure(figsize=(10, 10))
+        # plt.figure(figsize=(10, 10))
         #for image, label in self.train_data.take(1):
             #plt.imsave("image_test.jpg", image.numpy())
             #plt.axis("off")
@@ -65,14 +65,14 @@ class TreepediaDataset():
 
     def decode_image(self, img): 
         # Convert the compressed string to a 3D uint8 tensor
-        img = []
+        decoded_img = []
         if tf.io.is_jpeg(img):
-            img = tf.io.decode_jpeg(img, channels=3)
+            decoded_img  = tf.io.decode_jpeg(img, channels=3)
         else: # else image is png
-            img = tf.io.decode_png(img, channels=3)
+            decoded_img  = tf.io.decode_png(img, channels=3)
             
         # Resize + convert image to float representation
-        return tf.image.resize(img / 255, [hp.img_height, hp.img_width])
+        return tf.image.resize(decoded_img  / 255, [hp.img_height, hp.img_width])
 
     def process_file_line(self, img_path, label_path): 
         # read label in as float
