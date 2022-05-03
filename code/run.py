@@ -250,7 +250,7 @@ def main():
     model.compile(
         optimizer=model.optimizer,
         loss=model.loss_fn,
-        metrics=["sparse_categorical_accuracy"])
+        metrics=["mean_squared_error"])
 
     if ARGS.evaluate:
         test(model, datasets.test_data)
