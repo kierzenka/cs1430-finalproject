@@ -56,7 +56,7 @@ def parse_args():
         its checkpoint.''')
     parser.add_argument(
         '--lime-image',
-        default=None
+        default=None,
         help='''Name of an image in the dataset to use for LIME evaluation.''')
     parser.add_argument(
         '--gradcam-image',
@@ -326,10 +326,10 @@ def main():
         if ARGS.gradcam_image: 
             gradcam_path = ARGS.gradcam_image
             # not sure if this will work
-            last_conv_layer_name = "resnet50"
+            last_conv_layer = "resnet50"
             if ARGS.deep_green: 
-                last_conv_layer_name = "conv5"
-            make_gradcam_heatmap(gradcam_path, model, )
+                last_conv_layer = "conv5"
+            make_gradcam_heatmap(gradcam_path, model, last_conv_layer)
     else:
         train(model, datasets, checkpoint_path, logs_path, init_epoch)
 
