@@ -12,7 +12,7 @@ from datetime import datetime
 import tensorflow as tf
 
 import hyperparameters as hp
-from models import YourModel
+from models import YourModel, DeepGreenModel
 from load_dataset import TreepediaDataset
 from skimage.transform import resize
 # from tensorboard_utils import \
@@ -58,62 +58,65 @@ def parse_args():
         '--lime-image',
         default='test/Bedroom/image_0003.jpg',
         help='''Name of an image in the dataset to use for LIME evaluation.''')
+    parser.add_argument(
+        '--deep-green',
+        default=None,
+        help='''Trains using the Deep Green Diagnostics model'''
+    )
 
     return parser.parse_args()
 
 
-# def LIME_explainer(model, path, preprocess_fn):
-#     """
-#     This function takes in a trained model and a path to an image and outputs 5
-#     visual explanations using the LIME model
-#     """
-
-#     def image_and_mask(title, positive_only=True, num_features=5,
-#                        hide_rest=True):
-#         temp, mask = explanation.get_image_and_mask(
-#             explanation.top_labels[0], positive_only=positive_only,
-#             num_features=num_features, hide_rest=hide_rest)
-#         plt.imshow(mark_boundaries(temp / 2 + 0.5, mask))
-#         plt.title(title)
-#         plt.show()
-
-#     image = imread(path)
-#     if len(image.shape) == 2:
-#         image = np.stack([image, image, image], axis=-1)
-#     image = preprocess_fn(image)
-#     image = resize(image, (hp.img_size, hp.img_size, 3))
-
-#     explainer = lime_image.LimeImageExplainer()
-
-#     explanation = explainer.explain_instance(
-#         image.astype('double'), model.predict, top_labels=5, hide_color=0,
-#         num_samples=1000)
-
-#     # The top 5 superpixels that are most positive towards the class with the
-#     # rest of the image hidden
-#     image_and_mask("Top 5 superpixels", positive_only=True, num_features=5,
-#                    hide_rest=True)
-
-#     # The top 5 superpixels with the rest of the image present
-#     image_and_mask("Top 5 with the rest of the image present",
-#                    positive_only=True, num_features=5, hide_rest=False)
-
-#     # The 'pros and cons' (pros in green, cons in red)
-#     image_and_mask("Pros(green) and Cons(red)",
-#                    positive_only=False, num_features=10, hide_rest=False)
-
-#     # Select the same class explained on the figures above.
-#     ind = explanation.top_labels[0]
-#     # Map each explanation weight to the corresponding superpixel
-#     dict_heatmap = dict(explanation.local_exp[ind])
-#     heatmap = np.vectorize(dict_heatmap.get)(explanation.segments)
-#     plt.imshow(heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())
-#     plt.colorbar()
-#     plt.title("Map each explanation weight to the corresponding superpixel")
-#     plt.show()
-
-
 def LIME_explainer(model, path, preprocess_fn):
+    """
+    This function takes in a trained model and a path to an image and outputs 5
+    visual explanations using the LIME model
+    """
+
+    def image_and_mask(title, save_to, positive_only=True, num_features=5,
+                       hide_rest=True):
+        temp, mask = explanation.get_image_and_mask(
+            explanation.top_labels[0], positive_only=positive_only,
+            num_features=num_features, hide_rest=hide_rest)
+        x = mark_boundaries(temp / 2 + 0.5, mask)
+        arr = np.array((x - np.min(x)) / (np.max(x) - np.min(x)))
+        plt.imsave(fname=save_to, arr=arr)
+
+    # Read the image and preprocess it as before
+    image = imread(path)
+    if len(image.shape) == 2:
+        image = np.stack([image, image, image], axis=-1)
+    image = resize(image, (hp.img_size, hp.img_size, 3), preserve_range=True)
+    image = preprocess_fn(image)
+
+
+    explainer = lime_image.LimeImageExplainer()
+
+    explanation = explainer.explain_instance(
+        image.astype('double'), model.predict, top_labels=5, hide_color=0,
+        num_samples=1000)
+
+    # The top 5 superpixels that are most positive towards the class with the
+    # rest of the image hidden
+    image_and_mask("Top 5 superpixels", "top5superpixels.png", positive_only=True, num_features=5,
+                   hide_rest=True)
+
+    # The top 5 superpixels with the rest of the image present
+    image_and_mask("Top 5 with the rest of the image present", "top5withrestofimage.png",
+                   positive_only=True, num_features=5, hide_rest=False)
+
+    # The 'pros and cons' (pros in green, cons in red)
+    image_and_mask("Pros(green) and Cons(red)", "prosandcons.png",
+                   positive_only=False, num_features=10, hide_rest=False)
+
+    # Select the same class explained on the figures above.
+    ind = explanation.top_labels[0]
+    # Map each explanation weight to the corresponding superpixel
+    dict_heatmap = dict(explanation.local_exp[ind])
+    heatmap = np.vectorize(dict_heatmap.get)(explanation.segments)
+    plt.imsave(fname="mapweighttosuperpixel.png", arr=heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())
+
+def LIME_explainer(model, path):
     """
     This function takes in a trained model and a path to an image and outputs 5
     visual explanations using the LIME model
@@ -127,7 +130,6 @@ def LIME_explainer(model, path, preprocess_fn):
         data = mark_boundaries(temp/2+0.5,mask)
         print(np.min(data))
         data = (data - np.min(data)) / (np.max(data) - np.min(data))
-        #data = np.clip(data,0,1)
         plt.imsave(fname=path, arr=data)
 
 
@@ -136,9 +138,6 @@ def LIME_explainer(model, path, preprocess_fn):
     if len(image.shape) == 2:
         image = np.stack([image, image, image], axis=-1)
     image = resize(image, (hp.img_size, hp.img_size, 3))
-    image = image/ 255.0
-    image = preprocess_fn(image)
-    
     explainer = lime_image.LimeImageExplainer()
 
     explanation = explainer.explain_instance(
@@ -229,12 +228,21 @@ def main():
     datasets = TreepediaDataset(ARGS.data_gsv, ARGS.data_cityscapes)
 
    
-    model = YourModel()
-    model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
-    checkpoint_path = "checkpoints" + os.sep + \
-        "your_model" + os.sep + timestamp + os.sep
-    logs_path = "logs" + os.sep + "your_model" + \
-        os.sep + timestamp + os.sep
+    model, checkpoint_path, logs_path = None, None, None
+    if not ARGS.deep_green:
+        model = YourModel()
+        model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
+        checkpoint_path = "checkpoints" + os.sep + \
+            "your_model" + os.sep + timestamp + os.sep
+        logs_path = "logs" + os.sep + "your_model" + \
+            os.sep + timestamp + os.sep
+    else:
+        model = DeepGreenModel()
+        model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
+        checkpoint_path = "checkpoints" + os.sep + \
+            "deep_green_model" + os.sep + timestamp + os.sep
+        logs_path = "logs" + os.sep + "deep_green_model" + \
+            os.sep + timestamp + os.sep
 
     # Print summary of model
     model.summary()
@@ -261,6 +269,10 @@ def main():
         # i.e. python run.py --evaluate --lime-image test/Bedroom/image_003.jpg
         path = ARGS.data_gsv + os.sep + ARGS.lime_image
         LIME_explainer(model, path, datasets.preprocess_fn)
+    elif ARGS.lime_image:
+        path = ARGS.lime_image
+        print(path)
+        LIME_explainer(model, path)
     else:
         train(model, datasets, checkpoint_path, logs_path, init_epoch)
 
