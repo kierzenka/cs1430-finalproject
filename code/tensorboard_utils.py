@@ -189,8 +189,9 @@ class CustomModelSaver(tf.keras.callbacks.Callback):
 
         min_acc_file, max_acc_file, max_acc, num_weights = \
             self.scan_weight_files()
-
-        cur_acc = logs["val_sparse_categorical_accuracy"]
+        print("on epoch end")
+        print(logs)
+        cur_acc = logs["val_mean_squared_error"]
 
         # Only save weights if test accuracy exceeds the previous best
         # weight file
