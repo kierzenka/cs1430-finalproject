@@ -259,6 +259,8 @@ def main():
         # i.e. python run.py --evaluate --lime-image test/Bedroom/image_003.jpg
         path = ARGS.data_gsv + os.sep + ARGS.lime_image
         LIME_explainer(model, path, datasets.preprocess_fn)
+    elif ARGS.lime_image:
+        LIME_explainer(model, path, datasets.preprocess_fn)
     else:
         train(model, datasets, checkpoint_path, logs_path, init_epoch)
 
