@@ -12,7 +12,7 @@ from datetime import datetime
 import tensorflow as tf
 
 import hyperparameters as hp
-from models import YourModel
+from models import YourModel, DeepGreenModel
 from load_dataset import TreepediaDataset
 from skimage.transform import resize
 # from tensorboard_utils import \
@@ -58,6 +58,11 @@ def parse_args():
         '--lime-image',
         default='test/Bedroom/image_0003.jpg',
         help='''Name of an image in the dataset to use for LIME evaluation.''')
+    parser.add_argument(
+        '--deep-green',
+        default=None,
+        help='''Trains using the Deep Green Diagnostics model'''
+    )
 
     return parser.parse_args()
 
@@ -223,12 +228,21 @@ def main():
     datasets = TreepediaDataset(ARGS.data_gsv, ARGS.data_cityscapes)
 
    
-    model = YourModel()
-    model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
-    checkpoint_path = "checkpoints" + os.sep + \
-        "your_model" + os.sep + timestamp + os.sep
-    logs_path = "logs" + os.sep + "your_model" + \
-        os.sep + timestamp + os.sep
+    model, checkpoint_path, logs_path = None, None, None
+    if not ARGS.deep_green:
+        model = YourModel()
+        model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
+        checkpoint_path = "checkpoints" + os.sep + \
+            "your_model" + os.sep + timestamp + os.sep
+        logs_path = "logs" + os.sep + "your_model" + \
+            os.sep + timestamp + os.sep
+    else:
+        model = DeepGreenModel()
+        model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
+        checkpoint_path = "checkpoints" + os.sep + \
+            "deep_green_model" + os.sep + timestamp + os.sep
+        logs_path = "logs" + os.sep + "deep_green_model" + \
+            os.sep + timestamp + os.sep
 
     # Print summary of model
     model.summary()
