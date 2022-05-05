@@ -62,56 +62,54 @@ def parse_args():
     return parser.parse_args()
 
 
-# def LIME_explainer(model, path, preprocess_fn):
-#     """
-#     This function takes in a trained model and a path to an image and outputs 5
-#     visual explanations using the LIME model
-#     """
+def LIME_explainer(model, path, preprocess_fn):
+    """
+    This function takes in a trained model and a path to an image and outputs 5
+    visual explanations using the LIME model
+    """
 
-#     def image_and_mask(title, positive_only=True, num_features=5,
-#                        hide_rest=True):
-#         temp, mask = explanation.get_image_and_mask(
-#             explanation.top_labels[0], positive_only=positive_only,
-#             num_features=num_features, hide_rest=hide_rest)
-#         plt.imshow(mark_boundaries(temp / 2 + 0.5, mask))
-#         plt.title(title)
-#         plt.show()
+    def image_and_mask(title, save_to, positive_only=True, num_features=5,
+                       hide_rest=True):
+        temp, mask = explanation.get_image_and_mask(
+            explanation.top_labels[0], positive_only=positive_only,
+            num_features=num_features, hide_rest=hide_rest)
+        x = mark_boundaries(temp / 2 + 0.5, mask)
+        arr = np.array((x - np.min(x)) / (np.max(x) - np.min(x)))
+        plt.imsave(fname=save_to, arr=arr)
 
-#     image = imread(path)
-#     if len(image.shape) == 2:
-#         image = np.stack([image, image, image], axis=-1)
-#     image = preprocess_fn(image)
-#     image = resize(image, (hp.img_size, hp.img_size, 3))
+    # Read the image and preprocess it as before
+    image = imread(path)
+    if len(image.shape) == 2:
+        image = np.stack([image, image, image], axis=-1)
+    image = resize(image, (hp.img_size, hp.img_size, 3), preserve_range=True)
+    image = preprocess_fn(image)
 
-#     explainer = lime_image.LimeImageExplainer()
 
-#     explanation = explainer.explain_instance(
-#         image.astype('double'), model.predict, top_labels=5, hide_color=0,
-#         num_samples=1000)
+    explainer = lime_image.LimeImageExplainer()
 
-#     # The top 5 superpixels that are most positive towards the class with the
-#     # rest of the image hidden
-#     image_and_mask("Top 5 superpixels", positive_only=True, num_features=5,
-#                    hide_rest=True)
+    explanation = explainer.explain_instance(
+        image.astype('double'), model.predict, top_labels=5, hide_color=0,
+        num_samples=1000)
 
-#     # The top 5 superpixels with the rest of the image present
-#     image_and_mask("Top 5 with the rest of the image present",
-#                    positive_only=True, num_features=5, hide_rest=False)
+    # The top 5 superpixels that are most positive towards the class with the
+    # rest of the image hidden
+    image_and_mask("Top 5 superpixels", "top5superpixels.png", positive_only=True, num_features=5,
+                   hide_rest=True)
 
-#     # The 'pros and cons' (pros in green, cons in red)
-#     image_and_mask("Pros(green) and Cons(red)",
-#                    positive_only=False, num_features=10, hide_rest=False)
+    # The top 5 superpixels with the rest of the image present
+    image_and_mask("Top 5 with the rest of the image present", "top5withrestofimage.png",
+                   positive_only=True, num_features=5, hide_rest=False)
 
-#     # Select the same class explained on the figures above.
-#     ind = explanation.top_labels[0]
-#     # Map each explanation weight to the corresponding superpixel
-#     dict_heatmap = dict(explanation.local_exp[ind])
-#     heatmap = np.vectorize(dict_heatmap.get)(explanation.segments)
-#     plt.imshow(heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())
-#     plt.colorbar()
-#     plt.title("Map each explanation weight to the corresponding superpixel")
-#     plt.show()
+    # The 'pros and cons' (pros in green, cons in red)
+    image_and_mask("Pros(green) and Cons(red)", "prosandcons.png",
+                   positive_only=False, num_features=10, hide_rest=False)
 
+    # Select the same class explained on the figures above.
+    ind = explanation.top_labels[0]
+    # Map each explanation weight to the corresponding superpixel
+    dict_heatmap = dict(explanation.local_exp[ind])
+    heatmap = np.vectorize(dict_heatmap.get)(explanation.segments)
+    plt.imsave(fname="mapweighttosuperpixel.png", arr=heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())
 
 def LIME_explainer(model, path, preprocess_fn):
     """
