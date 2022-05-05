@@ -179,11 +179,12 @@ def train(model, datasets, checkpoint_path, logs_path, init_epoch):
     ]
 
     # Begin training
+    print("datasets size")
+    print(datasets.train_data.cardinality().numpy())
     model.fit(
         x=datasets.train_data,
         validation_data=datasets.test_data,
         epochs=hp.num_epochs,
-        batch_size=None,
         callbacks=callback_list,
         initial_epoch=init_epoch,
     )

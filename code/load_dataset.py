@@ -15,11 +15,15 @@ class TreepediaDataset():
         # make train & test dataset for citscapes data
         scapes_count, scapes_ds = self.make_dataset(cityscapes_data_path)
         
+        print("gsv, scapes count")
+        print(gsv_count)
+        print(scapes_count)
         # get total number of images in gsv + scapes datasets
         self.img_count = scapes_count + gsv_count
         # get train + test set for combined dataset
         self.train_data, self.test_data = self.load_dataset(gsv_ds, scapes_ds)
-
+        print(self.train_data.cardinality().numpy())
+        print(self.train_data)
         # plt.figure(figsize=(10, 10))
         #for image, label in self.train_data.take(1):
             #plt.imsave("image_test.jpg", image.numpy())
@@ -41,7 +45,7 @@ class TreepediaDataset():
                 # img_label_list = re.findall(r'\.\/[\w\_\/ ]+\.jpg', line)
                 # img_list.append(img_label_list[0])
                 # label_list.append(img_label_list[1])
-
+        print("filepath: " + filename + " " + str(len(img_list)))
         return  (len(img_list),
                  tf.convert_to_tensor(img_list), 
                  tf.convert_to_tensor(label_list),
@@ -86,12 +90,15 @@ class TreepediaDataset():
     def load_dataset(self, ds1, ds2): 
         # concatenate gsv and cityscapes datasets together
         list_ds = ds1.concatenate(ds2)
-       
+        print("load ds list ds")
+        print(list_ds.cardinality().numpy())
         # TODO: check sets are splitting properly
         # split the dataset into training and test sets
         val_size = int(self.img_count * hp.val_split)
         train_ds = list_ds.skip(val_size)
         test_ds = list_ds.take(val_size)
+        print(train_ds.cardinality().numpy())
+        print(test_ds.cardinality().numpy())
 
         # convert to images
         train_ds = train_ds.map(self.process_file_line,
@@ -102,7 +109,9 @@ class TreepediaDataset():
         # TODO: change batch size?
         train_ds = train_ds.shuffle(buffer_size=10 * hp.batch_size)
         # repeat and batch
-        train_ds = train_ds.repeat(hp.num_epochs).batch(hp.batch_size)
+        train_ds = train_ds.batch(hp.batch_size)
+
+        test_ds = test_ds.batch(hp.batch_size)
         # prefetch to increase efficiency
         train_ds = train_ds.prefetch(tf.data.AUTOTUNE)
         test_ds = test_ds.prefetch(tf.data.AUTOTUNE)
