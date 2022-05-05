@@ -187,15 +187,18 @@ class CustomModelSaver(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         """ At epoch end, weights are saved to checkpoint directory. """
 
-        min_acc_file, max_acc_file, max_acc, num_weights = \
+        min_acc_file, max_acc_file, min_acc, num_weights = \
             self.scan_weight_files()
         print("on epoch end")
         print(logs)
         cur_acc = logs["val_mean_absolute_error"]
-
+        print(min_acc)
+        print(cur_acc)
+        #print("currmax"+str(max_acc))
         # Only save weights if test accuracy exceeds the previous best
         # weight file
-        if cur_acc > max_acc:
+        if True:
+            
             save_name = "weights.e{0:03d}-acc{1:.4f}.h5".format(
                 epoch, cur_acc)
 
@@ -212,7 +215,7 @@ class CustomModelSaver(tf.keras.callbacks.Callback):
         accuracy weights files as well as the number of weights. """
 
         min_acc = float('inf')
-        max_acc = 0
+        max_acc = 1
         min_acc_file = ""
         max_acc_file = ""
         num_weights = 0
@@ -231,4 +234,4 @@ class CustomModelSaver(tf.keras.callbacks.Callback):
                     min_acc = file_acc
                     min_acc_file = weight_file
 
-        return min_acc_file, max_acc_file, max_acc, num_weights
+        return min_acc_file, max_acc_file, min_acc, num_weights
