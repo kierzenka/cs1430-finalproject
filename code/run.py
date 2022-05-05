@@ -268,11 +268,11 @@ def main():
         # the lime-image flag when calling run.py to investigate
         # i.e. python run.py --evaluate --lime-image test/Bedroom/image_003.jpg
         path = ARGS.data_gsv + os.sep + ARGS.lime_image
-        LIME_explainer(model, path, datasets.preprocess_fn)
+        # LIME_explainer(model, path, datasets.preprocess_fn)
     elif ARGS.lime_image:
         path = ARGS.lime_image
         print(path)
-        LIME_explainer(model, path)
+        # LIME_explainer(model, path)
     else:
         train(model, datasets, checkpoint_path, logs_path, init_epoch)
 
