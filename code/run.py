@@ -251,7 +251,7 @@ def main():
     model.compile(
         optimizer=model.optimizer,
         loss=model.loss_fn,
-        metrics=["mean_squared_error"])
+        metrics=["mean_absolute_error"])
 
     if ARGS.evaluate:
         test(model, datasets.test_data)
