@@ -125,7 +125,6 @@ def LIME_explainer(model, path):
         data = mark_boundaries(temp/2+0.5,mask)
         print(np.min(data))
         data = (data - np.min(data)) / (np.max(data) - np.min(data))
-        #data = np.clip(data,0,1)
         plt.imsave(fname=path, arr=data)
 
 
@@ -134,7 +133,6 @@ def LIME_explainer(model, path):
     if len(image.shape) == 2:
         image = np.stack([image, image, image], axis=-1)
     image = resize(image, (hp.img_size, hp.img_size, 3))
-    image = image/ 255.0
     explainer = lime_image.LimeImageExplainer()
 
     explanation = explainer.explain_instance(
