@@ -261,7 +261,7 @@ def main():
         LIME_explainer(model, path, datasets.preprocess_fn)
     elif ARGS.lime_image:
         path = ARGS.lime_image
-        println(path)
+        print(path)
         LIME_explainer(model, path, datasets.preprocess_fn)
     else:
         train(model, datasets, checkpoint_path, logs_path, init_epoch)
