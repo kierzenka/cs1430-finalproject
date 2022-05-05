@@ -111,7 +111,7 @@ def LIME_explainer(model, path, preprocess_fn):
     heatmap = np.vectorize(dict_heatmap.get)(explanation.segments)
     plt.imsave(fname="mapweighttosuperpixel.png", arr=heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())
 
-def LIME_explainer(model, path, preprocess_fn):
+def LIME_explainer(model, path):
     """
     This function takes in a trained model and a path to an image and outputs 5
     visual explanations using the LIME model
@@ -135,8 +135,6 @@ def LIME_explainer(model, path, preprocess_fn):
         image = np.stack([image, image, image], axis=-1)
     image = resize(image, (hp.img_size, hp.img_size, 3))
     image = image/ 255.0
-    image = preprocess_fn(image)
-    
     explainer = lime_image.LimeImageExplainer()
 
     explanation = explainer.explain_instance(
@@ -262,7 +260,7 @@ def main():
     elif ARGS.lime_image:
         path = ARGS.lime_image
         print(path)
-        LIME_explainer(model, path, datasets.preprocess_fn)
+        LIME_explainer(model, path)
     else:
         train(model, datasets, checkpoint_path, logs_path, init_epoch)
 
