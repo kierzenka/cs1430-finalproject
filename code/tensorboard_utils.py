@@ -195,17 +195,17 @@ class CustomModelSaver(tf.keras.callbacks.Callback):
 
         # Only save weights if test accuracy exceeds the previous best
         # weight file
-        if cur_acc > max_acc:
-            save_name = "weights.e{0:03d}-acc{1:.4f}.h5".format(
-                epoch, cur_acc)
+        # if cur_acc > max_acc:
+        save_name = "weights.e{0:03d}-acc{1:.4f}.h5".format(
+            epoch, cur_acc)
 
-            self.model.save_weights(
-                self.checkpoint_dir + os.sep + "your." + save_name)
-            # Ensure max_num_weights is not exceeded by removing
-            # minimum weight
-            if self.max_num_weights > 0 and \
-                    num_weights + 1 > self.max_num_weights:
-                os.remove(self.checkpoint_dir + os.sep + min_acc_file)
+        self.model.save_weights(
+            self.checkpoint_dir + os.sep + "your." + save_name)
+        # Ensure max_num_weights is not exceeded by removing
+        # minimum weight
+        # if self.max_num_weights > 0 and \
+        #         num_weights + 1 > self.max_num_weights:
+        #         os.remove(self.checkpoint_dir + os.sep + min_acc_file)
 
     def scan_weight_files(self):
         """ Scans checkpoint directory to find current minimum and maximum
