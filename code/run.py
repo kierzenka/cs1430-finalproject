@@ -13,6 +13,7 @@ import tensorflow as tf
 
 import hyperparameters as hp
 from models import YourModel, DeepGreenModel
+from sequential_models import make_deep_green_seq_model
 from load_dataset import TreepediaDataset
 from skimage.transform import resize
 # from tensorboard_utils import \
@@ -65,60 +66,13 @@ def parse_args():
     parser.add_argument(
         '--deep-green',
         default=None,
-        help='''Trains using the Deep Green Diagnostics model'''
-    )
+        help='''Trains using the Deep Green Diagnostics model''')
+    parser.add_argument(
+        '--sequential',
+        action='store_true',
+        help='''Uses Sequential model (necessary for GRAD-cam)''')
 
     return parser.parse_args()
-
-
-def LIME_explainer(model, path, preprocess_fn):
-    """
-    This function takes in a trained model and a path to an image and outputs 5
-    visual explanations using the LIME model
-    """
-
-    def image_and_mask(title, save_to, positive_only=True, num_features=5,
-                       hide_rest=True):
-        temp, mask = explanation.get_image_and_mask(
-            explanation.top_labels[0], positive_only=positive_only,
-            num_features=num_features, hide_rest=hide_rest)
-        x = mark_boundaries(temp / 2 + 0.5, mask)
-        arr = np.array((x - np.min(x)) / (np.max(x) - np.min(x)))
-        plt.imsave(fname=save_to, arr=arr)
-
-    # Read the image and preprocess it as before
-    image = imread(path)
-    if len(image.shape) == 2:
-        image = np.stack([image, image, image], axis=-1)
-    image = resize(image, (hp.img_size, hp.img_size, 3), preserve_range=True)
-    image = preprocess_fn(image)
-
-
-    explainer = lime_image.LimeImageExplainer()
-
-    explanation = explainer.explain_instance(
-        image.astype('double'), model.predict, top_labels=5, hide_color=0,
-        num_samples=1000)
-
-    # The top 5 superpixels that are most positive towards the class with the
-    # rest of the image hidden
-    image_and_mask("Top 5 superpixels", "../data/lime_images/top5superpixels.png", positive_only=True, num_features=5,
-                   hide_rest=True)
-
-    # The top 5 superpixels with the rest of the image present
-    image_and_mask("Top 5 with the rest of the image present", "../data/lime_images/top5withrestofimage.png",
-                   positive_only=True, num_features=5, hide_rest=False)
-
-    # The 'pros and cons' (pros in green, cons in red)
-    image_and_mask("Pros(green) and Cons(red)", "../data/lime_images/prosandcons.png",
-                   positive_only=False, num_features=10, hide_rest=False)
-
-    # Select the same class explained on the figures above.
-    ind = explanation.top_labels[0]
-    # Map each explanation weight to the corresponding superpixel
-    dict_heatmap = dict(explanation.local_exp[ind])
-    heatmap = np.vectorize(dict_heatmap.get)(explanation.segments)
-    plt.imsave(fname="mapweighttosuperpixel.png", arr=heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())
 
 def LIME_explainer(model, path):
     """
@@ -178,8 +132,6 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
         # of size (1, 299, 299, 3)
         array = np.expand_dims(array, axis=0)
         return array
-
-    # TODO: will only work for ResNet model rn
 
     # First, we create a model that maps the input image to the activations
     # of the last conv layer as well as the output predictions
@@ -279,20 +231,24 @@ def main():
 
    
     model, checkpoint_path, logs_path = None, None, None
-    if not ARGS.deep_green:
+    if ARGS.deep_green:
+        if ARGS.sequential:
+            model = DeepGreenModel()
+            model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
+        else:
+            model = make_deep_green_seq_model(hp.img_size, hp.img_size)
+            checkpoint_path = "checkpoints" + os.sep + \
+                "deep_green_model_seq" + os.sep + timestamp + os.sep
+            logs_path = "logs" + os.sep + "deep_green_model_seq" + \
+                os.sep + timestamp + os.sep
+    else:
         model = YourModel()
         model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
         checkpoint_path = "checkpoints" + os.sep + \
             "your_model" + os.sep + timestamp + os.sep
         logs_path = "logs" + os.sep + "your_model" + \
-            os.sep + timestamp + os.sep
-    else:
-        model = DeepGreenModel()
-        model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
-        checkpoint_path = "checkpoints" + os.sep + \
-            "deep_green_model" + os.sep + timestamp + os.sep
-        logs_path = "logs" + os.sep + "deep_green_model" + \
-            os.sep + timestamp + os.sep
+             os.sep + timestamp + os.sep
+        
 
     # Print summary of model
     model.summary()
@@ -306,10 +262,18 @@ def main():
         os.makedirs(checkpoint_path)
 
     # Compile model graph
-    model.compile(
-        optimizer=model.optimizer,
-        loss=model.loss_fn,
-        metrics=["mean_absolute_error"])
+
+    if ARGS.sequential and ARGS.deep_green:
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
+            loss=tf.keras.losses.MeanSquaredError(),
+            metrics=["mean_absolute_error"]
+        )
+    else:
+        model.compile(
+            optimizer=model.optimizer,
+            loss=model.loss_fn,
+            metrics=["mean_absolute_error"])
 
     if ARGS.evaluate:
         test(model, datasets.test_data)

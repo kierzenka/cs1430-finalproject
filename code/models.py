@@ -3,7 +3,7 @@ from tensorflow.keras.layers import \
     Conv2D, MaxPool2D, Dropout, Flatten, Dense
 import hyperparameters as hp
 
-class DeepGreenModel(tf.keras.Sequential): 
+class DeepGreenModel(tf.keras.Model): 
     """ 
     Model based on Deep Green Diagnostics
     https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6928838/#sec3dot2-sensors-19-05287 
@@ -48,7 +48,7 @@ class DeepGreenModel(tf.keras.Sequential):
        return mse(labels, predictions)
 
 
-class YourModel(tf.keras.Sequential):
+class YourModel(tf.keras.Model):
     """ Your own neural network model. """
 
     def __init__(self):
