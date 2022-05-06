@@ -15,7 +15,7 @@ class DeepGreenModel(tf.keras.Model):
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.01)
 
         self.architecture = [
-            tf.keras.Input(244, 244, 3),
+            tf.keras.Input((244, 244, 3)),
             Conv2D(32, kernel_size=(5, 5), activation='relu', strides=1, padding='same', name='conv1'),
             MaxPool2D((2,2), strides=(2,2)), 
             Conv2D(64, kernel_size=(5, 5), activation='relu', strides=1, padding='same', name='conv2'),
