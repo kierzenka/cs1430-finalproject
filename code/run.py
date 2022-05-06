@@ -233,14 +233,19 @@ def main():
     model, checkpoint_path, logs_path = None, None, None
     if ARGS.deep_green:
         if ARGS.sequential:
-            model = DeepGreenModel()
-            model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
-        else:
             model = make_deep_green_seq_model(hp.img_size, hp.img_size)
             checkpoint_path = "checkpoints" + os.sep + \
                 "deep_green_model_seq" + os.sep + timestamp + os.sep
             logs_path = "logs" + os.sep + "deep_green_model_seq" + \
                 os.sep + timestamp + os.sep
+        else:
+            model = DeepGreenModel()
+            model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
+            checkpoint_path = "checkpoints" + os.sep + \
+                "deep_green_model" + os.sep + timestamp + os.sep
+            logs_path = "logs" + os.sep + "deep_green_model" + \
+                os.sep + timestamp + os.sep
+            
     else:
         model = YourModel()
         model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
