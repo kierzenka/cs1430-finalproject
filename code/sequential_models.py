@@ -6,29 +6,25 @@ def make_deep_green_seq_model(img_height, img_width):
     model = tf.keras.Sequential(
     [
         tf.keras.Input(shape=(img_height, img_width, 3)),
-        Conv2D(filters=64, kernel_size=(3, 3), padding='same',
-            strides=(1, 1), activation='relu'), 
-        MaxPool2D(pool_size=(2, 2)),
-
-        Conv2D(filters=128, kernel_size=(5, 5), padding='same',
-            strides=(1, 1), activation='relu'), 
-        MaxPool2D(pool_size=(2, 2)),
-
-        Conv2D(filters=256, kernel_size=(7, 7), padding='same',
-            strides=(1, 1), activation='relu'), 
-        Conv2D(filters=512, kernel_size=(7, 7), padding='same',
-            strides=(1, 1), activation='relu'), 
-        MaxPool2D(pool_size=(2, 2)),
+        Conv2D(32, kernel_size=(3, 3), activation='relu', strides=1, padding='same'),
+        Conv2D(32, kernel_size=(3, 3), activation='relu', strides=1, padding='same'),
+        MaxPool2D((2,2), strides=(2,2)), 
+        Conv2D(64, kernel_size=(3, 3), activation='relu', strides=1, padding='same', name='conv2'),
+        Conv2D(64, kernel_size=(3, 3), activation='relu', strides=1, padding='same', name='conv2'),
+        MaxPool2D((2,2), strides=(2,2)), 
+        Conv2D(128, kernel_size=(5, 5), activation='relu', strides=1, padding='same', name='conv3'),
+        Conv2D(128, kernel_size=(5, 5), activation='relu', strides=1, padding='same', name='conv3'),
+        MaxPool2D((2,2), strides=(2,2)), 
+        Conv2D(256, kernel_size=(7, 7), activation='relu', strides=1, padding='same', name='conv4'),
+        Conv2D(512, kernel_size=(7, 7), activation='relu', strides=1, padding='same', name='conv5'),
+        MaxPool2D((2,2), strides=(2,2)), 
         SpatialDropout2D(0.5),
-
         Flatten(),
-        Dense(units=1024, activation="relu"),
-        Dense(units=512, activation="relu"), 
         Dropout(rate=0.5),
-        Dense(units=256, activation="relu"), 
-        Dense(units=128, activation="relu"), 
-        Dense(units=64, activation="relu"),
-        Dense(units=1, activation="sigmoid")
+        Dense(1024, activation='relu'), # reduced the size because of training time
+        Dense(256, activation='relu'), 
+        Dense(64, activation='relu'), 
+        Dense(1, activation='sigmoid')
     ])
     
     return model
