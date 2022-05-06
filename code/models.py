@@ -3,7 +3,7 @@ from tensorflow.keras.layers import \
     Conv2D, MaxPool2D, Dropout, Flatten, Dense
 import hyperparameters as hp
 
-class DeepGreenModel(tf.keras.Model): 
+class DeepGreenModel(tf.keras.Sequential): 
     """ 
     Model based on Deep Green Diagnostics
     https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6928838/#sec3dot2-sensors-19-05287 
@@ -15,7 +15,6 @@ class DeepGreenModel(tf.keras.Model):
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.01)
 
         self.architecture = [
-            tf.keras.Input(shape=(244, 244, 3)),
             Conv2D(32, kernel_size=(5, 5), activation='relu', strides=1, padding='same', name='conv1'),
             MaxPool2D((2,2), strides=(2,2)), 
             Conv2D(64, kernel_size=(5, 5), activation='relu', strides=1, padding='same', name='conv2'),
@@ -49,7 +48,7 @@ class DeepGreenModel(tf.keras.Model):
        return mse(labels, predictions)
 
 
-class YourModel(tf.keras.Model):
+class YourModel(tf.keras.Sequential):
     """ Your own neural network model. """
 
     def __init__(self):
