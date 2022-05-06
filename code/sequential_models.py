@@ -12,13 +12,13 @@ def make_deep_green_seq_model(img_height, img_width):
 
         Conv2D(filters=128, kernel_size=(5, 5), padding='same',
             strides=(1, 1), activation='relu'), 
-        MaxPool2D(pool_size=(4, 4)),
+        MaxPool2D(pool_size=(2, 2)),
 
         Conv2D(filters=256, kernel_size=(7, 7), padding='same',
             strides=(1, 1), activation='relu'), 
         Conv2D(filters=512, kernel_size=(7, 7), padding='same',
             strides=(1, 1), activation='relu'), 
-        MaxPool2D(pool_size=(6, 6)),
+        MaxPool2D(pool_size=(2, 2)),
         SpatialDropout2D(0.5),
 
         Flatten(),
