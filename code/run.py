@@ -131,13 +131,16 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
     # of the last conv layer as well as the output predictions
     inputs = tf.keras.Input(shape=(1, 299, 299, 3))
     grad_model = tf.keras.models.Model(
-        inputs, [model.get_layer(last_conv_layer_name).output, model.output]
+        [model.inputs], [model.get_layer(last_conv_layer_name).output, model.output]
     )
 
     # Then, we compute the gradient of the top predicted class for our input image
     # with respect to the activations of the last conv layer
     with tf.GradientTape() as tape:
-        last_conv_layer_output, preds = grad_model(get_img_array(img_path))
+        last_conv_layer_output, preds = grad_model.predict(
+                                        x=get_img_array(img_path),
+                                        batch_size=1,
+                                        )
         if pred_index is None:
             pred_index = tf.argmax(preds[0])
         class_channel = preds[:, pred_index]
