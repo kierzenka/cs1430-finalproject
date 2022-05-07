@@ -198,10 +198,25 @@ def main():
         os.makedirs(checkpoint_path)
 
     # Compile model graph
+<<<<<<< HEAD
     model.compile(
         optimizer=model.optimizer,
         loss=model.loss_fn,
         metrics=["mean_absolute_error"])
+=======
+
+    if ARGS.sequential and ARGS.deep_green:
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
+            loss=tf.keras.losses.MeanSquaredError(),
+            metrics=["mean_absolute_error"]
+        )
+    else:
+        model.compile(
+            optimizer=model.optimizer,
+            loss=model.loss_fn,
+            metrics=["mean_absolute_error"])
+>>>>>>> parent of 45a1b26 (adjusted learning rate)
 
     if ARGS.evaluate:
         test(model, datasets.test_data)
