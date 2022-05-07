@@ -191,7 +191,9 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
     heatmap = (tf.maximum(heatmap, 0) / tf.math.reduce_max(heatmap)).numpy()
     # plt.matshow(heatmap)
     # plt.show()
-    plt.imsave("heatmap.jpg", heatmap)
+    print(heatmap.min())
+    print(heatmap.max())
+    plt.imsave("heatmap.png", heatmap)
     return heatmap
 
 def train(model, datasets, checkpoint_path, logs_path, init_epoch):
