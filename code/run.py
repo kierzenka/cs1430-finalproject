@@ -190,7 +190,7 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
     print(heatmap.max())
 
     # For visualization purpose, we will also normalize the heatmap between 0 & 1
-    heatmap =  (heatmap - heatmap.min) / (heatmap.max - heatmap.min)
+    heatmap =  (heatmap - heatmap.min()) / (heatmap.max() - heatmap.min())
     # plt.matshow(heatmap)
     # plt.show()
     print(heatmap.min())
