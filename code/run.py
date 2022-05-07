@@ -119,7 +119,7 @@ def LIME_explainer(model, path):
     heatmap = np.vectorize(dict_heatmap.get)(explanation.segments)
     plt.imsave(fname="mapweighttosuperpixel.png", arr=heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())
 
-def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0.2):
+def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0.4):
     # Load the original image
     img = Image.open(img_path).convert("RGBA").resize((244, 244))
 
