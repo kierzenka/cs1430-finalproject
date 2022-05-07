@@ -117,7 +117,7 @@ def LIME_explainer(model, path):
     heatmap = np.vectorize(dict_heatmap.get)(explanation.segments)
     plt.imsave(fname="mapweighttosuperpixel.png", arr=heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())
 
-def superimposed_gradcam(img_path, heatmap, cam_path="../data/gradcam/superimposed.jpg", alpha=0.4):
+def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.jpg", alpha=0.4):
     # Load the original image
     img = tf.keras.preprocessing.image.load_img(img_path)
     img = tf.keras.preprocessing.image.img_to_array(img)
@@ -191,7 +191,7 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
     heatmap = (tf.maximum(heatmap, 0) / tf.math.reduce_max(heatmap)).numpy()
     # plt.matshow(heatmap)
     # plt.show()
-    plt.imsave("../data/grad_cam/heatmap.jpg", heatmap)
+    plt.imsave("heatmap.jpg", heatmap)
     return heatmap
 
 def train(model, datasets, checkpoint_path, logs_path, init_epoch):
