@@ -218,10 +218,19 @@ def test(model, test_data):
     """ Testing routine. """
 
     # Run model on test set
-    model.evaluate(
-        x=test_data,
-        verbose=1,
-    )
+    # model.evaluate(
+    #     x=test_data,
+    #     verbose=1,
+    # )
+
+    test_data = test_data.unbatch()
+    images = np.asarray(list(test_data.map(lambda x, y: x)))
+    labels = np.asarray(list(test_data.map(lambda x, y: y)))
+    predictions = model(images)
+    print("in test")
+    print(images.shape)
+    print(labels.shape)
+    print(predictions.shape)
 
 
 def main():
