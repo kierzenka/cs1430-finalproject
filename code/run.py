@@ -119,10 +119,9 @@ def LIME_explainer(model, path):
     heatmap = np.vectorize(dict_heatmap.get)(explanation.segments)
     plt.imsave(fname="mapweighttosuperpixel.png", arr=heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())
 
-def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0.4):
+def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0.6):
     # Load the original image
-    img = tf.keras.preprocessing.image.load_img(img_path, target_size=(244, 244))
-    img_array = tf.keras.preprocessing.image.img_to_array(img)
+    img = Image.open(img_path).convert("RGBA")
 
     # Use jet colormap to colorize heatmap
     jet = cm.jet
@@ -131,12 +130,8 @@ def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0
 
     # Convert jet heatmap to PIL image
     jet_heatmap = Image.fromarray(jet_heatmap)
-    jet_heatmap = jet_heatmap.resize((img_array.shape[1], img_array.shape[0]))
+    jet_heatmap = jet_heatmap.resize((244,))
     jet_heatmap = jet_heatmap.convert("RGBA")
-
-    # Load img_array as PIL image
-    img = np.uint8(255 * img_array)
-    img = Image.fromarray(img).convert("RGBA")
 
     # Superimpose the heatmap on original image
     superimposed = Image.blend(img.convert("RGB"), jet_heatmap.convert("RGB"), alpha)
@@ -146,7 +141,7 @@ def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0
     # jet_heatmap.save("test.png")
 
     # create mask for superimposing
-    paste_mask = jet_heatmap.split()[3].point(lambda i: i * 0.2)
+    # paste_mask = jet_heatmap.split()[3].point(lambda i: i * 0.2)
 
     # superimpose images
     # img.paste(jet_heatmap, (0,0), mask=paste_mask)
