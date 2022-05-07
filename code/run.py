@@ -124,13 +124,14 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
         array = tf.keras.preprocessing.image.img_to_array(img)
         # We add a dimension to transform our array into a "batch"
         # of size (1, 299, 299, 3)
-        #array = np.expand_dims(array, axis=0)
+        array = np.expand_dims(array, axis=0)
         return array
 
     # First, we create a model that maps the input image to the activations
     # of the last conv layer as well as the output predictions
+    inputs = tf.keras.Input(shape=(1, 299, 299, 3))
     grad_model = tf.keras.models.Model(
-        [model.inputs], [model.get_layer(last_conv_layer_name).output, model.output]
+        inputs, [model.get_layer(last_conv_layer_name).output, model.output]
     )
 
     # Then, we compute the gradient of the top predicted class for our input image
