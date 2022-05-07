@@ -3,6 +3,9 @@
 
 # Copyright(C) Xiaojiang Li, Ian Seiferling, Marwa Abdulhai, Senseable City Lab, MIT 
 
+# from importlib.metadata import metadata
+
+
 def GSVpanoMetadataCollector(samplesFeatureClass,num,ouputTextFolder):
     '''
     This function is used to call the Google API url to collect the metadata of
@@ -15,28 +18,24 @@ def GSVpanoMetadataCollector(samplesFeatureClass,num,ouputTextFolder):
         ouputTextFolder: the output folder for the panoinfo
         
     '''
-    
+
     import urllib,urllib2
     import xmltodict
     import cStringIO
-    import ogr, osr
+    from osgeo import ogr, osr
     import time
     import os,os.path
+    import google_streetview.api
+    import json
     
     if not os.path.exists(ouputTextFolder):
         os.makedirs(ouputTextFolder)
     
     driver = ogr.GetDriverByName('ESRI Shapefile')
     
-    # change the projection of shapefile to the WGS84
     dataset = driver.Open(samplesFeatureClass)
     layer = dataset.GetLayer()
-    
-    sourceProj = layer.GetSpatialRef()
-    targetProj = osr.SpatialReference()
-    targetProj.ImportFromEPSG(4326)
-    transform = osr.CoordinateTransformation(sourceProj, targetProj)
-    
+
     # loop all the features in the featureclass
     feature = layer.GetNextFeature()
     featureNum = layer.GetFeatureCount()
@@ -61,39 +60,44 @@ def GSVpanoMetadataCollector(samplesFeatureClass,num,ouputTextFolder):
         with open(ouputGSVinfoFile, 'w') as panoInfoText:
             # process num feature each time
             for i in range(start, end):
-                feature = layer.GetFeature(i)        
+                feature = layer.GetFeature(i)      
                 geom = feature.GetGeometryRef()
-                
-                # trasform the current projection of input shapefile to WGS84
-                #WGS84 is Earth centered, earth fixed terrestrial ref system
-                geom.Transform(transform)
                 lon = geom.GetX()
                 lat = geom.GetY()
-                key = r'' #Input Your Key here 
                 
-                # get the meta data of panoramas 
-                urlAddress = r'http://maps.google.com/cbk?output=xml&ll=%s,%s'%(lat,lon)
+                # Define parameters for street view api
+                params = [{
+                'size': '600x300', # max 640x640 pixels
+                'location': '%s,%s'%(lat, lon),
+                'key': 'AIzaSyAlYsUPjNiqEcNhtzKdtqlALkPBizG_y_w'
+                }]
                 
-                time.sleep(0.05)
-                # the output result of the meta data is a xml object
-                metaDataxml = urllib2.urlopen(urlAddress)
-                metaData = metaDataxml.read()    
+                #get image
+                results = google_streetview.api.results(params)
                 
-                data = xmltodict.parse(metaData)
+                #save pictures for verification
+                results.download_links('/Users/alexkamper/Desktop/metadataOutput')
                 
+                #get metadata as json, convert to dict
+                results.save_metadata('/Users/alexkamper/Desktop/metadataOutput/metadata2.json')
+                with open('/Users/alexkamper/Desktop/metadataOutput/metadata2.json') as f:
+                    data1 = json.load(f)
+                data = data1[0]
+
                 # in case there is not panorama in the site, therefore, continue
-                if data['panorama']==None:
+                if data['pano_id']==None:
+                    print('no panorama')
                     continue
                 else:
-                    panoInfo = data['panorama']['data_properties']
-                                        
+                    # panoInfo = data['panorama']['data_properties']
+                    print('getting metadata')         
                     # get the meta data of the panorama
-                    panoDate = panoInfo.items()[4][1]
-                    panoId = panoInfo.items()[5][1]
-                    panoLat = panoInfo.items()[8][1]
-                    panoLon = panoInfo.items()[9][1]
+                    panoDate = data['date']
+                    panoId = data['pano_id']
+                    panoLat = data['location']['lat']
+                    panoLon = data["location"]['lng']
                     
-                    print 'The coordinate (%s,%s), panoId is: %s, panoDate is: %s'%(panoLon,panoLat,panoId, panoDate)
+                    print('The coordinate (%s,%s), panoId is: %s, panoDate is: %s'%(panoLon,panoLat,panoId, panoDate))
                     lineTxt = 'panoID: %s panoDate: %s longitude: %s latitude: %s\n'%(panoId, panoDate, panoLon, panoLat)
                     panoInfoText.write(lineTxt)
                     
@@ -104,9 +108,12 @@ def GSVpanoMetadataCollector(samplesFeatureClass,num,ouputTextFolder):
 if __name__ == "__main__":
     import os, os.path
     
-    root = 'MYPATH/spatial-data'
-    inputShp = os.path.join(root,'Cambridge20m.shp')
-    outputTxt = root
+    # root = 'MYPATH/spatial-data'
+    # inputShp = os.path.join(root,'Cambridge20m.shp')
+    # outputTxt = root
+
+    inputShp = '/Users/alexkamper/Desktop/cs1430-finalproject/code/provpointsExperiment/provpointsExperiment.shp'
+    outputTxt = '/Users/alexkamper/Desktop/metadataOutput'
     
     GSVpanoMetadataCollector(inputShp,1000,outputTxt)
 
