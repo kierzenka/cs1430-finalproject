@@ -18,6 +18,7 @@ from skimage.io import imread
 from lime import lime_image
 from skimage.segmentation import mark_boundaries
 from matplotlib import pyplot as plt
+import matplotlib.cm as cm
 import numpy as np
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -116,6 +117,33 @@ def LIME_explainer(model, path):
     heatmap = np.vectorize(dict_heatmap.get)(explanation.segments)
     plt.imsave(fname="mapweighttosuperpixel.png", arr=heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())
 
+def superimposed_gradcam(img_path, heatmap, cam_path="../data/cam.jpg", alpha=0.4):
+    # Load the original image
+    img = tf.keras.preprocessing.image.load_img(img_path)
+    img = tf.keras.preprocessing.image.img_to_array(img)
+
+    # Rescale heatmap to a range 0-255
+    heatmap = np.uint8(255 * heatmap)
+
+    # Use jet colormap to colorize heatmap
+    jet = cm.get_cmap("jet")
+
+    # Use RGB values of the colormap
+    jet_colors = jet(np.arange(256))[:, :3]
+    jet_heatmap = jet_colors[heatmap]
+
+    # Create an image with RGB colorized heatmap
+    jet_heatmap = tf.keras.preprocessing.image.array_to_img(jet_heatmap)
+    jet_heatmap = jet_heatmap.resize((img.shape[1], img.shape[0]))
+    jet_heatmap = tf.keras.preprocessing.image.img_to_array(jet_heatmap)
+
+    # Superimpose the heatmap on original image
+    superimposed_img = jet_heatmap * alpha + img
+    superimposed_img = tf.keras.preprocessing.image.array_to_img(superimposed_img)
+
+    # Save the superimposed image
+    superimposed_img.save(cam_path)
+
 def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None):
     
     def get_img_array(img_path):
@@ -161,9 +189,10 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
 
     # For visualization purpose, we will also normalize the heatmap between 0 & 1
     heatmap = (tf.maximum(heatmap, 0) / tf.math.reduce_max(heatmap)).numpy()
-    plt.matshow(heatmap)
-    plt.show()
-    # plt.imsave("../data/grad_cam/heatmap.png", heatmap)
+    # plt.matshow(heatmap)
+    # plt.show()
+    plt.imsave("../data/grad_cam/heatmap.jpg", heatmap)
+    return heatmap
 
 def train(model, datasets, checkpoint_path, logs_path, init_epoch):
     """ Training routine. """
@@ -297,7 +326,9 @@ def main():
             last_conv_layer = "resnet50"
             if ARGS.deep_green: 
                 last_conv_layer = "conv5"
-            make_gradcam_heatmap(gradcam_path, model, last_conv_layer)
+            heatmap = make_gradcam_heatmap(gradcam_path, model, last_conv_layer)
+            superimposed_gradcam(gradcam_path, heatmap)
+            
     else:
         train(model, datasets, checkpoint_path, logs_path, init_epoch)
 
