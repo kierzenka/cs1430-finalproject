@@ -138,7 +138,7 @@ def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0
     img = Image.fromarray(img)
 
     # Superimpose the heatmap on original image
-    superimposed = Image.blend(img, jet_heatmap, alpha)
+    # superimposed = Image.blend(img, jet_heatmap, alpha)
 
     # Save the superimposed image
     # superimposed.save(cam_path)
