@@ -84,6 +84,7 @@ def LIME_explainer(model, path):
             num_features=num_features, hide_rest=hide_rest)
         data = mark_boundaries(temp/2+0.5,mask)
         print(np.min(data))
+        print(np.max(data))
         data = (data - np.min(data)) / (np.max(data) - np.min(data))
         plt.imsave(fname=path, arr=data)
 
