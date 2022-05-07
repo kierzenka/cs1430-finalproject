@@ -146,11 +146,12 @@ def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0
     # jet_heatmap.save("test.png")
 
     # create mask for superimposing
-    paste_mask = jet_heatmap.split()[3].point(lambda i: i * 0.6)
+    paste_mask = jet_heatmap.split()[3].point(lambda i: i * 0.2)
 
     # superimpose images
-    img.paste(jet_heatmap, (0,0), mask=paste_mask)
-    img.save('res.png')
+    # img.paste(jet_heatmap, (0,0), mask=paste_mask)
+    # img.save(cam_path)
+    img.save("test.png")
 
 def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None):
     
