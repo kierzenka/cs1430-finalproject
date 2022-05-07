@@ -124,15 +124,10 @@ def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0
     img = tf.keras.preprocessing.image.load_img(img_path, target_size=(244, 244))
     img_array = tf.keras.preprocessing.image.img_to_array(img)
 
-    # Rescale heatmap to a range 0-255
-    heatmap = np.uint8(255 * heatmap)
-
     # Use jet colormap to colorize heatmap
-    jet = cm.get_cmap("jet")
-
-    # Use RGB values of the colormap
-    jet_colors = jet(np.arange(256))[:, :3]
-    jet_heatmap = np.uint8(jet_colors[heatmap])
+    jet = cm.jet
+    jet_heatmap = jet(heatmap)
+    jet_heatmap = np.uint8(255 * jet_heatmap)
 
     # Convert jet heatmap to PIL image
     jet_heatmap = Image.fromarray(jet_heatmap)
