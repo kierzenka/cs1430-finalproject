@@ -1,9 +1,3 @@
-"""
-Homework 5 - CNNs
-CS1430 - Computer Vision
-Brown University
-"""
-
 import os
 import sys
 import argparse
@@ -13,7 +7,6 @@ import tensorflow as tf
 
 import hyperparameters as hp
 from models import YourModel, DeepGreenModel
-from sequential_models import make_deep_green_seq_model
 from load_dataset import TreepediaDataset
 from skimage.transform import resize
 # from tensorboard_utils import \
