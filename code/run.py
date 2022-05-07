@@ -185,11 +185,12 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
     # then sum all the channels to obtain the heatmap class activation
     last_conv_layer_output = last_conv_layer_output[0]
     heatmap = last_conv_layer_output @ pooled_grads[..., tf.newaxis]
-    heatmap = tf.squeeze(heatmap)
+    heatmap = tf.squeeze(heatmap).numpy()
     print(heatmap.numpy().min())
     print(heatmap.numpy().max())
+
     # For visualization purpose, we will also normalize the heatmap between 0 & 1
-    heatmap = (tf.maximum(heatmap, 0) / tf.math.reduce_max(heatmap)).numpy()
+    heatmap =  (heatmap - heatmap.min) / (heatmap.max - heatmap.min)
     # plt.matshow(heatmap)
     # plt.show()
     print(heatmap.min())
