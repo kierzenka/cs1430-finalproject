@@ -29,6 +29,12 @@ so that is hard-coded elsewhere.
 img_size = 224
 
 """
+Image height and width for resizinn
+"""
+img_height = 224
+img_width = 224
+
+"""
 Sample size for calculating the mean and standard deviation of the
 training data. This many images will be randomly seleted to be read
 into memory temporarily.
@@ -46,9 +52,15 @@ max_num_weights = 5
 Defines the number of training examples per batch.
 You don't need to modify this.
 """
-batch_size = 4
+batch_size = 50
 
 """
 The number of image scene classes. Don't change this.
 """
 num_classes = 15
+
+"""
+A float between 0 and 1 the represents the fraction of data to 
+reserve for validation.
+"""
+val_split = 0.2
