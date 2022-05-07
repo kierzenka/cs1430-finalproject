@@ -18,8 +18,10 @@ from skimage.io import imread
 from lime import lime_image
 from skimage.segmentation import mark_boundaries
 from matplotlib import pyplot as plt
+from PIL import Image
 import matplotlib.cm as cm
 import numpy as np
+
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -117,10 +119,10 @@ def LIME_explainer(model, path):
     heatmap = np.vectorize(dict_heatmap.get)(explanation.segments)
     plt.imsave(fname="mapweighttosuperpixel.png", arr=heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())
 
-def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.jpg", alpha=0.4):
+def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0.4):
     # Load the original image
     img = tf.keras.preprocessing.image.load_img(img_path, target_size=(244, 244))
-    img = tf.keras.preprocessing.image.img_to_array(img)
+    img_array = tf.keras.preprocessing.image.img_to_array(img)
 
     # Rescale heatmap to a range 0-255
     heatmap = np.uint8(255 * heatmap)
@@ -130,19 +132,21 @@ def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.jpg", alpha=0
 
     # Use RGB values of the colormap
     jet_colors = jet(np.arange(256))[:, :3]
-    jet_heatmap = jet_colors[heatmap]
+    jet_heatmap = np.uint8(jet_colors[heatmap])
 
-    # Create an image with RGB colorized heatmap
-    jet_heatmap = tf.keras.preprocessing.image.array_to_img(jet_heatmap)
-    jet_heatmap = jet_heatmap.resize((img.shape[1], img.shape[0]))
-    jet_heatmap = tf.keras.preprocessing.image.img_to_array(jet_heatmap)
+    # Convert jet heatmap to PIL image
+    jet_heatmap = Image.fromarray(jet_heatmap)
+    jet_heatmap = jet_heatmap.resize((img_array.shape[1], img_array.shape[0]))
+
+    # Load img_array as PIL image
+    img = np.uint8(255 * img_array)
+    img = Image.fromarray(img)
 
     # Superimpose the heatmap on original image
-    superimposed_img = jet_heatmap * alpha + img
-    superimposed_img = tf.keras.preprocessing.image.array_to_img(superimposed_img)
+    superimposed = Image.blend(img, jet_heatmap, alpha)
 
     # Save the superimposed image
-    plt.imsave(cam_path, superimposed_img)
+    superimposed.save(cam_path)
 
 def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None):
     
