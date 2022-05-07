@@ -5,7 +5,7 @@ from tensorflow.keras.layers import \
 def make_deep_green_seq_model(img_height, img_width): 
     model = tf.keras.Sequential(
     [
-        tf.keras.Input(shape=(img_height, img_width, 3)),
+        tf.keras.Input(shape=(244, 244, 3)),
         Conv2D(32, kernel_size=(5, 5), activation='relu', strides=1, padding='same', name='conv1'),
         MaxPool2D((2,2), strides=(2,2)), 
         Conv2D(64, kernel_size=(5, 5), activation='relu', strides=1, padding='same', name='conv2'),

@@ -127,6 +127,8 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
         array = np.expand_dims(array, axis=0)
         return array
 
+    model.layers[-1].activation = None
+
     # First, we create a model that maps the input image to the activations
     # of the last conv layer as well as the output predictions
     grad_model = tf.keras.models.Model(
@@ -136,10 +138,8 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
     # Then, we compute the gradient of the top predicted class for our input image
     # with respect to the activations of the last conv layer
     with tf.GradientTape() as tape:
-        last_conv_layer_output, preds = grad_model.predict(
-                                        x=get_img_array(img_path),
-                                        batch_size=None,
-                                        )
+        last_conv_layer_output, preds = grad_model(get_img_array(img_path))
+        
         if pred_index is None:
             pred_index = tf.argmax(preds[0])
         class_channel = preds[:, pred_index]
@@ -161,7 +161,9 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
 
     # For visualization purpose, we will also normalize the heatmap between 0 & 1
     heatmap = (tf.maximum(heatmap, 0) / tf.math.reduce_max(heatmap)).numpy()
-    plt.imsave("../data/grad_cam/heatmap", heatmap)
+    plt.matshow(heatmap)
+    plt.show()
+    # plt.imsave("../data/grad_cam/heatmap.png", heatmap)
 
 def train(model, datasets, checkpoint_path, logs_path, init_epoch):
     """ Training routine. """
