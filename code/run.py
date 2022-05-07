@@ -130,7 +130,7 @@ def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0
 
     # Convert jet heatmap to PIL image
     jet_heatmap = Image.fromarray(jet_heatmap)
-    jet_heatmap = jet_heatmap.resize((244,))
+    jet_heatmap = jet_heatmap.resize((244,244))
     jet_heatmap = jet_heatmap.convert("RGBA")
 
     # Superimpose the heatmap on original image
