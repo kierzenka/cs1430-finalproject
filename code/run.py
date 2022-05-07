@@ -186,8 +186,8 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
     last_conv_layer_output = last_conv_layer_output[0]
     heatmap = last_conv_layer_output @ pooled_grads[..., tf.newaxis]
     heatmap = tf.squeeze(heatmap).numpy()
-    print(heatmap.numpy().min())
-    print(heatmap.numpy().max())
+    print(heatmap.min())
+    print(heatmap.max())
 
     # For visualization purpose, we will also normalize the heatmap between 0 & 1
     heatmap =  (heatmap - heatmap.min) / (heatmap.max - heatmap.min)
