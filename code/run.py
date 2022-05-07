@@ -7,6 +7,7 @@ import tensorflow as tf
 
 import hyperparameters as hp
 from models import YourModel, DeepGreenModel
+from sequential_models import make_deep_green_seq_model
 from load_dataset import TreepediaDataset
 from skimage.transform import resize
 # from tensorboard_utils import \
@@ -53,9 +54,18 @@ def parse_args():
         default=None,
         help='''Name of an image in the dataset to use for LIME evaluation.''')
     parser.add_argument(
+        '--gradcam-image',
+        default=None,
+        help='''Name of an image in the dataset to use for GRAD-cam evaluaton''')
+    parser.add_argument(
         '--deep-green',
-        default='store_true',
+        default=None,
         help='''Trains using the Deep Green Diagnostics model''')
+    parser.add_argument(
+        '--sequential',
+        action='store_true',
+        help='''Uses Sequential model (necessary for GRAD-cam)''')
+
     return parser.parse_args()
 
 def LIME_explainer(model, path):
@@ -104,7 +114,51 @@ def LIME_explainer(model, path):
     # Map each explanation weight to the corresponding superpixel
     dict_heatmap = dict(explanation.local_exp[ind])
     heatmap = np.vectorize(dict_heatmap.get)(explanation.segments)
-    plt.imsave(fname="mapweighttosuperpixel.png", arr=heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())s
+    plt.imsave(fname="mapweighttosuperpixel.png", arr=heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())
+
+def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None):
+    
+    def get_img_array(img_path):
+        img = tf.keras.preprocessing.image.load_img(img_path, target_size=(244, 244))
+        # `array` is a float32 Numpy array of shape (299, 299, 3)
+        array = tf.keras.preprocessing.image.img_to_array(img)
+        # We add a dimension to transform our array into a "batch"
+        # of size (1, 299, 299, 3)
+        array = np.expand_dims(array, axis=0)
+        return array
+
+    # First, we create a model that maps the input image to the activations
+    # of the last conv layer as well as the output predictions
+    grad_model = tf.keras.models.Model(
+        [model.inputs], [model.get_layer(last_conv_layer_name).output, model.output]
+    )
+
+    # Then, we compute the gradient of the top predicted class for our input image
+    # with respect to the activations of the last conv layer
+    with tf.GradientTape() as tape:
+        last_conv_layer_output, preds = grad_model(get_img_array(img_path))
+        if pred_index is None:
+            pred_index = tf.argmax(preds[0])
+        class_channel = preds[:, pred_index]
+
+    # This is the gradient of the output neuron (top predicted or chosen)
+    # with regard to the output feature map of the last conv layer
+    grads = tape.gradient(class_channel, last_conv_layer_output)
+
+    # This is a vector where each entry is the mean intensity of the gradient
+    # over a specific feature map channel
+    pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
+
+    # We multiply each channel in the feature map array
+    # by "how important this channel is" with regard to the top predicted class
+    # then sum all the channels to obtain the heatmap class activation
+    last_conv_layer_output = last_conv_layer_output[0]
+    heatmap = last_conv_layer_output @ pooled_grads[..., tf.newaxis]
+    heatmap = tf.squeeze(heatmap)
+
+    # For visualization purpose, we will also normalize the heatmap between 0 & 1
+    heatmap = (tf.maximum(heatmap, 0) / tf.math.reduce_max(heatmap)).numpy()
+    plt.imsave("../data/grad_cam/heatmap", heatmap)
 
 def train(model, datasets, checkpoint_path, logs_path, init_epoch):
     """ Training routine. """
@@ -168,15 +222,24 @@ def main():
     os.chdir(sys.path[0])
 
     datasets = TreepediaDataset(ARGS.data_gsv, ARGS.data_cityscapes)
+
    
     model, checkpoint_path, logs_path = None, None, None
     if ARGS.deep_green:
-        model = DeepGreenModel()
-        model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
-        checkpoint_path = "checkpoints" + os.sep + \
-            "deep_green_model" + os.sep + timestamp + os.sep
-        logs_path = "logs" + os.sep + "deep_green_model" + \
-            os.sep + timestamp + os.sep
+        if ARGS.sequential:
+            model = make_deep_green_seq_model(hp.img_size, hp.img_size)
+            checkpoint_path = "checkpoints" + os.sep + \
+                "deep_green_model_seq" + os.sep + timestamp + os.sep
+            logs_path = "logs" + os.sep + "deep_green_model_seq" + \
+                os.sep + timestamp + os.sep
+        else:
+            model = DeepGreenModel()
+            model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
+            checkpoint_path = "checkpoints" + os.sep + \
+                "deep_green_model" + os.sep + timestamp + os.sep
+            logs_path = "logs" + os.sep + "deep_green_model" + \
+                os.sep + timestamp + os.sep
+            
     else:
         model = YourModel()
         model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
@@ -198,12 +261,6 @@ def main():
         os.makedirs(checkpoint_path)
 
     # Compile model graph
-<<<<<<< HEAD
-    model.compile(
-        optimizer=model.optimizer,
-        loss=model.loss_fn,
-        metrics=["mean_absolute_error"])
-=======
 
     if ARGS.sequential and ARGS.deep_green:
         model.compile(
@@ -216,7 +273,6 @@ def main():
             optimizer=model.optimizer,
             loss=model.loss_fn,
             metrics=["mean_absolute_error"])
->>>>>>> parent of 45a1b26 (adjusted learning rate)
 
     if ARGS.evaluate:
         test(model, datasets.test_data)
@@ -226,9 +282,17 @@ def main():
         # i.e. python run.py --evaluate --lime-image test/Bedroom/image_003.jpg
         path = ARGS.data_gsv + os.sep + ARGS.lime_image
         LIME_explainer(model, path, datasets.preprocess_fn)
-    elif ARGS.lime_image:
-        lime_path = ARGS.lime_image
-        LIME_explainer(model, lime_path)
+    elif ARGS.lime_image or ARGS.gradcam_image:
+        if ARGS.lime_image:
+            lime_path = ARGS.lime_image
+            LIME_explainer(model, lime_path)
+        if ARGS.gradcam_image: 
+            gradcam_path = ARGS.gradcam_image
+            # not sure if this will work
+            last_conv_layer = "resnet50"
+            if ARGS.deep_green: 
+                last_conv_layer = "conv5"
+            make_gradcam_heatmap(gradcam_path, model, last_conv_layer)
     else:
         train(model, datasets, checkpoint_path, logs_path, init_epoch)
 
