@@ -124,7 +124,7 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
         array = tf.keras.preprocessing.image.img_to_array(img)
         # We add a dimension to transform our array into a "batch"
         # of size (1, 299, 299, 3)
-        # array = np.expand_dims(array, axis=0)
+        array = np.expand_dims(array, axis=0)
         return array
 
     # First, we create a model that maps the input image to the activations
@@ -138,7 +138,7 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
     with tf.GradientTape() as tape:
         last_conv_layer_output, preds = grad_model.predict(
                                         x=get_img_array(img_path),
-                                        batch_size=1,
+                                        batch_size=None,
                                         )
         if pred_index is None:
             pred_index = tf.argmax(preds[0])
