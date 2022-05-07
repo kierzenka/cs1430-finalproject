@@ -119,7 +119,7 @@ def LIME_explainer(model, path):
 
 def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.jpg", alpha=0.4):
     # Load the original image
-    img = tf.keras.preprocessing.image.load_img(img_path)
+    img = tf.keras.preprocessing.image.load_img(img_path, target_size=(244, 244))
     img = tf.keras.preprocessing.image.img_to_array(img)
 
     # Rescale heatmap to a range 0-255
