@@ -21,8 +21,8 @@ def make_deep_green_seq_model(img_height, img_width):
         SpatialDropout2D(0.5),
         Flatten(),
         Dropout(rate=0.5),
-        Dense(1024, activation='relu'), # reduced the size because of training time
-        Dense(256, activation='relu'), 
+        Dense(256, activation='relu'), # reduced the size because of training time
+        Dense(128, activation='relu'), 
         Dense(64, activation='relu'), 
         Dense(1, activation='sigmoid')
     ])
