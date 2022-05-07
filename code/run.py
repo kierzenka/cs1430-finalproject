@@ -119,7 +119,7 @@ def LIME_explainer(model, path):
     heatmap = np.vectorize(dict_heatmap.get)(explanation.segments)
     plt.imsave(fname="mapweighttosuperpixel.png", arr=heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())
 
-def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0.6):
+def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0.2):
     # Load the original image
     img = Image.open(img_path).convert("RGBA").resize((244, 244))
 
@@ -138,15 +138,7 @@ def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0
 
     # Save the superimposed image
     superimposed.save(cam_path)
-    # jet_heatmap.save("test.png")
 
-    # create mask for superimposing
-    # paste_mask = jet_heatmap.split()[3].point(lambda i: i * 0.2)
-
-    # superimpose images
-    # img.paste(jet_heatmap, (0,0), mask=paste_mask)
-    # img.save(cam_path)
-    # img.save("test.png")
 
 def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None):
     
@@ -190,15 +182,9 @@ def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None)
     last_conv_layer_output = last_conv_layer_output[0]
     heatmap = last_conv_layer_output @ pooled_grads[..., tf.newaxis]
     heatmap = tf.squeeze(heatmap).numpy()
-    print(heatmap.min())
-    print(heatmap.max())
 
     # For visualization purpose, we will also normalize the heatmap between 0 & 1
     heatmap =  (heatmap - heatmap.min()) / (heatmap.max() - heatmap.min())
-    # plt.matshow(heatmap)
-    # plt.show()
-    print(heatmap.min())
-    print(heatmap.max())
     plt.imsave("heatmap.png", heatmap)
     return heatmap
 
