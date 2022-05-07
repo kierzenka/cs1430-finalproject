@@ -121,7 +121,7 @@ def LIME_explainer(model, path):
 
 def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0.6):
     # Load the original image
-    img = Image.open(img_path).convert("RGBA")
+    img = Image.open(img_path).convert("RGBA").resize((244, 244))
 
     # Use jet colormap to colorize heatmap
     jet = cm.jet
@@ -130,7 +130,7 @@ def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0
 
     # Convert jet heatmap to PIL image
     jet_heatmap = Image.fromarray(jet_heatmap)
-    jet_heatmap = jet_heatmap.resize((244,244))
+    jet_heatmap = jet_heatmap.resize((244, 244))
     jet_heatmap = jet_heatmap.convert("RGBA")
 
     # Superimpose the heatmap on original image
