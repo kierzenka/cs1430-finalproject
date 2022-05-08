@@ -105,6 +105,22 @@ class TreepediaDataset():
                                 num_parallel_calls=tf.data.AUTOTUNE)
         test_ds = test_ds.map(self.process_file_line,
                               num_parallel_calls=tf.data.AUTOTUNE)
+
+
+        unbatched_train = train_ds.unbatch()
+        images = np.asarray(list(unbatched_train.map(lambda x, y: x)))
+
+        sample_size = 400
+        rand_indices = np.random.rand(sample_size)*images.shape[0]
+        sample = images[rand_indices]
+        mean = np.sum(sample, axis=0) / sample_size
+        stand = np.std(sample,axis=0)
+        print("mean std")
+        print(mean.shape)
+        print(stand.shape)
+        train_ds = train_ds.map(lambda x: (x-mean)/stand)
+        test_ds = test_ds.map(lambda x: (x-mean)/stand)
+        #samp x 244 x 244 x 3
         # shuffle data again
         # TODO: change batch size?
         train_ds = train_ds.shuffle(buffer_size=10 * hp.batch_size)
