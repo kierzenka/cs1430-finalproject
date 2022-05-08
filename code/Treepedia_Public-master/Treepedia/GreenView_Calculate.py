@@ -14,6 +14,13 @@
 
 # Copyright(C) Xiaojiang Li, Ian Seiferling, Marwa Abdulhai, Senseable City Lab, MIT 
 # First version June 18, 2014
+
+
+import numpy as np
+import google_streetview.api
+import pymeanshift as pms
+import numpy as np
+
 def graythresh(array,level):
     '''array: is the numpy array waiting for processing
     return thresh: is the result got by OTSU algorithm
@@ -21,7 +28,6 @@ def graythresh(array,level):
     by Xiaojiang Li
     '''
     
-    import numpy as np
     
     maxVal = np.max(array)
     minVal = np.min(array)
@@ -90,8 +96,6 @@ def VegetationClassification(Img):
     By Xiaojiang Li
     '''
     
-    import pymeanshift as pms
-    import numpy as np
     
     # use the meanshift segmentation algorithm to segment the original GSV image
     (segmented_image, labels_image, number_regions) = pms.segment(Img,spatial_radius=6,
@@ -176,11 +180,13 @@ def GreenViewComputing_ogr_6Horizon(GSVinfoFolder, outTXTRoot, greenmonth, key_f
     
     
     # read the Google Street View API key files, you can also replace these keys by your own
-    lines = open(key_file,"r")
-    keylist = []
-    for line in lines:
-        key = line[:-1]
-        keylist.append(key)
+    # lines = open(key_file,"r")
+    # keylist = []
+    # for line in lines:
+    #     key = line[:-1]
+    #     keylist.append(key)
+
+    keylist = ['AIzaSyDP0-gjhOOQWLYjs9hJvY_SQFIbmxqBcho', 'AIzaSyDNxoQqbjAvmPh7FAgRfzHnJKxxjSq6Wmg', 'AIzaSyDMbxl3Rgx0WUqFbAnvg86xBWsWYtE9o2Q', 'AIzaSyAcFzgZMXbUVE1KDukqcHjt5Ixfm6WoSXM']
     
     print ('The key list is:=============', keylist)
     
@@ -223,7 +229,7 @@ def GreenViewComputing_ogr_6Horizon(GSVinfoFolder, outTXTRoot, greenmonth, key_f
                 lon = metadata[5]
                 lat = metadata[7][:-1]
                 
-                # print (lon, lat, month, panoID, panoDate)
+                print(lon, lat, month, panoID, panoDate)
                 
                 # in case, the longitude and latitude are invalide
                 if len(lon)<3:
@@ -245,8 +251,8 @@ def GreenViewComputing_ogr_6Horizon(GSVinfoFolder, outTXTRoot, greenmonth, key_f
             
             # check whether the file already generated, if yes, skip. Therefore, you can run several process at same time using this code.
             # print GreenViewTxtFile
-            if os.path.exists(GreenViewTxtFile):
-                continue
+            # if os.path.exists(GreenViewTxtFile):
+            #     continue
             
             # write the green view and pano info to txt            
             with open(GreenViewTxtFile,"w") as gvResTxt:
@@ -264,32 +270,71 @@ def GreenViewComputing_ogr_6Horizon(GSVinfoFolder, outTXTRoot, greenmonth, key_f
                     greenPercent = 0.0
 
                     for heading in headingArr:
-                        # print "Heading is: ",heading
+                        print('Heading is:%s')%(heading)
                         
                         # using different keys for different process, each key can only request 25,000 imgs every 24 hours
-                        URL = "http://maps.googleapis.com/maps/api/streetview?size=400x400&pano=%s&fov=60&heading=%d&pitch=%d&sensor=false&key=AIzaSyAwLr6Oz0omObrCJ4n6lI4VbCCvmaL1Z3Y"%(panoID,heading,pitch)
+                        # URL = "http://maps.googleapis.com/maps/api/streetview?size=400x400&pano=%s&fov=60&heading=%d&pitch=%d&sensor=false&key=AIzaSyAwLr6Oz0omObrCJ4n6lI4VbCCvmaL1Z3Y"%(panoID,heading,pitch)
                         
-                        # let the code to pause by 1s, in order to not go over data limitation of Google quota
-                        time.sleep(1)
-                        
-                        # classify the GSV images and calcuate the GVI
-                        try:
-                            response = requests.get(URL)
-                            im = np.array(Image.open(StringIO(response.content)))
-                            percent = VegetationClassification(im)
-                            greenPercent = greenPercent + percent
 
-                        # if the GSV images are not download successfully or failed to run, then return a null value
+                        # Define parameters for street view api
+                        params = [{
+                        'pano': panoID,
+                        'heading': heading,
+                        'pitch': pitch,
+                        'key': key
+                        }]
+                        
+
+
+                        # let the code to pause by 1s, in order to not go over data limitation of Google quota
+                        # time.sleep(1)
+
+
+                        # classify the GSV images and calcuate the GVI
+                        # try:
+                        #     #get image
+                        #     response = google_streetview.api.results(params)
+                        #     myIm = np.array(Image.open(StringIO(response.content)))
+                        #     percent = VegetationClassification(myIm)
+                        #     greenPercent = greenPercent + percent
+                        #     print('greenPercent is:%s')%(greenPercent)
+
+                        # # if the GSV images are not download successfully or failed to run, then return a null value
+                        # except:
+                        #     print('GSV imgs failed to download')
+                        #     greenPercent = -1000
+                        #     break
+                        try:
+                            #create name for image
+                            a_path = '/Users/alexkamper/Desktop'
+                            a_folder = "pics"
+                            a_file = 'img%s%s'%(i,heading)
+
+                            joined_path = os.path.join(a_path, a_folder, a_file)
+                            #get image
+                            results = google_streetview.api.results(params)
+                            print('got result')
+                            #TODO: failing here
+                            results.download_links(joined_path)
+                            print('got image')
+                            myIm = Image.open(joined_path)
+                            percent = VegetationClassification(myIm)
+                            greenPercent = greenPercent + percent
+                            print('greenPercent is:%s')%(greenPercent)
+
+                            # if the GSV images are not download successfully or failed to run, then return a null value
                         except:
+                            print('GSV imgs failed to download')
                             greenPercent = -1000
                             break
 
                     # calculate the green view index by averaging six percents from six images
                     greenViewVal = greenPercent/numGSVImg
-                    # print 'The greenview: %s, pano: %s, (%s, %s)'%(greenViewVal, panoID, lat, lon)
+                    print('The greenview: %s, pano: %s, (%s, %s)')%(greenViewVal, panoID, lat, lon)
 
-                    im_to_save = Image.fromarray(im)
+                    im_to_save = Image.fromarray(myIm)
                     im_to_save.save("../../data/images/" + panoID + ".jpg")
+                    print('saving')
 
                     # write the result and the pano info to the result txt file
                     lineTxt = 'panoID: %s panoDate: %s longitude: %s latitude: %s, greenview: %s\n'%(panoID, panoDate, lon, lat, greenViewVal)
@@ -303,10 +348,13 @@ if __name__ == "__main__":
     import itertools
     
     #TODO: change GSVinfoRoot and key_file paths, change greenmonth array to only be months where there is the most green foliage
-    GSVinfoRoot = '../../spatial-data/metadata'
-    outputTextPath = r'../../data/greenViewRes'
-    greenmonth = ['01','02','03','04','05','06','07','08','09','10','11','12']
-    key_file = '../keys.txt'
+    # GSVinfoRoot = '../../spatial-data/metadata'
+    # outputTextPath = r'../../data/greenViewRes'
+    # greenmonth = ['01','02','03','04','05','06','07','08','09','10','11','12']
+    GSVinfoRoot = '/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/metadataOutput'
+    outputTextPath = '/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/provGreenView'
+    greenmonth = ['06','07','08']
+    key_file = '/Users/alexkamper/Desktop/cs1430-finalproject/code/Treepedia_Public-master/keys.txt'
     
     GreenViewComputing_ogr_6Horizon(GSVinfoRoot,outputTextPath, greenmonth, key_file)
 

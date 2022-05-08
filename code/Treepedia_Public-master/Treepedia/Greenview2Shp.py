@@ -45,7 +45,7 @@ def Read_GSVinfo_Text(GVI_Res_txt):
             continue
         
         elif float(greenView) < 0:
-            print greenView
+            print(greenView)
             continue
         
         # remove the duplicated panorama id
@@ -153,7 +153,7 @@ def CreatePointFeature_ogr(outputShapefile,LonLst,LatLst,panoIDlist,panoDateList
     outLayer = data_source.CreateLayer(lyrname, targetSpatialRef, ogr.wkbPoint)
     numPnt = len(LonLst)
 
-    print 'the number of points is:',numPnt
+    print('the number of points is:%s')%numPnt
 
     if numPnt > 0:
         # create a field
@@ -195,7 +195,7 @@ def CreatePointFeature_ogr(outputShapefile,LonLst,LatLst,panoIDlist,panoDateList
         data_source.Destroy()
 
     else:
-        print 'You created a empty shapefile'
+        print('You created a empty shapefile')
 
 
 

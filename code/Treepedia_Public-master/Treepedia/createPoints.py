@@ -115,9 +115,9 @@ if __name__ == "__main__":
     # inshp = os.path.join(root,'CambridgeStreet_wgs84.shp')
     # outshp = os.path.join(root,'Cambridge20m.shp')
 
-    inshp = '/Users/alexkamper/Desktop/cs1430-finalproject/provNoHwys/provNoHwys.shp'
-    outshp = '/Users/alexkamper/Desktop/testProvOutput3'
-    mini_dist = 20 #the minimum distance between two generated points in meter
+    inshp = 'data/provData/provNoHwys/provNoHwys.shp'
+    outshp = 'data/provData/provpointsExperiment'
+    mini_dist = 20 #the minimum distance between two generated points in meters
     createPoints(inshp, outshp, mini_dist)
 
 
