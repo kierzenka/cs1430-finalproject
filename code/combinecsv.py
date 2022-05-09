@@ -2,7 +2,7 @@ gsv_pieces = ['Pnt_start0_end1000','Pnt_start1000_end2000','Pnt_start2000_end300
 
 id_to_coor = {}
 for chunk in gsv_pieces:
-    with open("../data/provData/metadataOutput/"+chunk+".txt", 'r') as f:
+    with open("../data/provData/metadataNew/"+chunk+".txt", 'r') as f:
       lines = f.readlines()
       for l in lines:
         id = l.split(":")[1].split()[0].strip()

@@ -19,8 +19,6 @@ def GSVpanoMetadataCollector(samplesFeatureClass,num,ouputTextFolder):
         
     '''
 
-    import urllib,urllib2
-    import xmltodict
     import cStringIO
     from osgeo import ogr, osr
     import time
@@ -69,18 +67,18 @@ def GSVpanoMetadataCollector(samplesFeatureClass,num,ouputTextFolder):
                 params = [{
                 'size': '600x300', # max 640x640 pixels
                 'location': '%s,%s'%(lat, lon),
-                'key': 'AIzaSyAlYsUPjNiqEcNhtzKdtqlALkPBizG_y_w'
+                'key': 'AIzaSyDHoCT01Ixth_JKqK7k_lkkr00mpDoNDF0'
                 }]
                 
                 #get image
                 results = google_streetview.api.results(params)
                 
                 #save pictures for verification
-                results.download_links('/Users/alexkamper/Desktop/metadataOutput')
+                results.download_links('/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/links')
                 
                 #get metadata as json, convert to dict
-                results.save_metadata('/Users/alexkamper/Desktop/metadataOutput/metadata2.json')
-                with open('/Users/alexkamper/Desktop/metadataOutput/metadata2.json') as f:
+                results.save_metadata('/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/metadataNew.json')
+                with open('/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/metadataNew.json') as f:
                     data1 = json.load(f)
                 data = data1[0]
 
@@ -108,8 +106,8 @@ def GSVpanoMetadataCollector(samplesFeatureClass,num,ouputTextFolder):
 if __name__ == "__main__":
     import os, os.path
     
-    inputShp = 'data/provData/provpointsExperiment/provpointsExperiment.shp'
-    outputTxt = 'data/provData/metadataOutput'
+    inputShp = '/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/provPointsNew/provPointsNew.shp'
+    outputTxt = '/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/metaDataNew'
     
     GSVpanoMetadataCollector(inputShp,1000,outputTxt)
 
