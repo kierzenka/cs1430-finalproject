@@ -1,10 +1,14 @@
 import google_streetview.api
 import google_streetview.helpers
 import shutil
-output_path = "./prov_gsv_images"
-section_path = "Pnt_start3000_end4000"
-with open("./metadataOutput/"+section_path+".txt", 'r') as f:
+import os
+
+output_path = "/Users/alexkamper/Desktop/cs1430-finalproject/data/provData"
+section_path = "provImages"
+# with open("./metaDataNew/"+section_path+".txt", 'r') as f:
+with open("/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/metaDataNew/Pnt_start5000_end6000.txt", 'r') as f:
     line_list = f.readlines()
+    print(len(line_list))
     pano_list = ""
     for l in line_list:
         panoID = l.split(":")[1].split()[0].strip()
@@ -16,8 +20,10 @@ with open("./metadataOutput/"+section_path+".txt", 'r') as f:
         'key':'AIzaSyCKNesxqMcBamAoPcNRR2YoxBgeQ60SOT0'}]
         
         results = google_streetview.api.results(params)
-        results.download_links(output_path+"/temp")
-        shutil.move(output_path+"/temp/gsv_0.jpg", output_path+"/"+section_path+"/"+panoID+".jpg") 
+        print('downloaded')
+        results.download_links("/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/temp")
+        os.rename("/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/temp/gsv_0.jpg", "/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/provImages/"+panoID+".jpg")
+        # shutil.move(output_path+"/temp/gsv_0.jpg", output_path+"/"+section_path+"/"+panoID+".jpg") 
     #print(l)
     #print(l.split(":"))
     #print(l.split(":")[1].split()[0].strip())
