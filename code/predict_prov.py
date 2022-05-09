@@ -51,7 +51,7 @@ model = YourModel()
 model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
 
 
-model.load_weights(os.path.abspath("checkpoints/your_model/050522-204942/your.weights.e018-acc0.0871.h5"), by_name=False)
+model.load_weights(os.path.abspath("checkpoints/your_model/050822-201054/your.weights.e013-acc0.0888.h5"), by_name=False)
 
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
@@ -59,11 +59,23 @@ model.compile(
     metrics=["mean_absolute_error"])
 
 
-cur_chunk = "Pnt_start0_end1000"
+cur_chunk = "Pnt_start3000_end4000"
 filenames = glob.glob('../data/provData/prov_gsv_images/'+ cur_chunk + '/*.jpg')
 print(len(filenames))
 image_list = tf.stack(list(map(process_file_line, filenames)))
 panoIDs = [i.split("/")[-1][:-4] for i in filenames]
+
+sample_size = 400
+rand_indices = np.floor(np.random.rand(sample_size)*image_list.shape[0])
+                #print(rand_indices[0:10])
+                        #print(rand_indices.dtype)
+rand_indices = rand_indices.astype(int)
+sample = image_list.numpy()[rand_indices]
+mean = np.sum(sample, axis=0) / sample_size
+stand = np.std(sample,axis=0)
+
+image_list = tf.map_fn(fn=lambda x: (x-mean)/stand, elems=image_list)
+
 
 output = model.predict(image_list, batch_size=32)
 
