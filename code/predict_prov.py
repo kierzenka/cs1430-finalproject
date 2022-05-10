@@ -57,7 +57,7 @@ model.compile(
     metrics=["mean_absolute_error"])
 
 
-cur_chunk = "Pnt_start0000_end1000"
+cur_chunk = "Pnt_start1000_end2000"
 # filenames = glob.glob('../data/provData/prov_gsv_images/'+ cur_chunk + '/*.jpg')
 filenames = glob.glob("/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/provImages/"+cur_chunk+"/*.jpg")
 print(len(filenames))
@@ -78,7 +78,7 @@ image_list = tf.map_fn(fn=lambda x: (x-mean)/stand, elems=image_list)
 
 output = model.predict(image_list, batch_size=32)
 
-with open("../data/provData/"+cur_chunk+"_labels.txt",'w') as f:
+with open("/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/"+cur_chunk+"_labels.txt",'w') as f:
   for i in range(len(output)):
     f.write(panoIDs[i]+","+str(output[i][0])+"\n")
 # print(output[:50])
