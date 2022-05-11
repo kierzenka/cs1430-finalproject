@@ -1,10 +1,4 @@
 """
-Homework 5 - CNNs
-CS1430 - Computer Vision
-Brown University
-"""
-
-"""
 Number of epochs. If you experiment with more complex networks you
 might need to increase this. Likewise if you add regularization that
 slows training.

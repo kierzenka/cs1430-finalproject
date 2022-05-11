@@ -6,13 +6,10 @@ from datetime import datetime
 import tensorflow as tf
 
 import hyperparameters as hp
-from models import YourModel, DeepGreenModel
+from models import DCNNModel, DeepGreenModel
 from sequential_models import make_deep_green_seq_model
-from load_dataset import TreepediaDataset
+from load_dataset import GreenDataset
 from skimage.transform import resize
-# from tensorboard_utils import \
-#         ImageLabelingLogger, ConfusionMatrixLogger, CustomModelSaver
-from tensorboard_utils import CustomModelSaver
 
 from skimage.io import imread
 from lime import lime_image
@@ -121,6 +118,15 @@ def LIME_explainer(model, path):
     plt.imsave(fname="mapweighttosuperpixel.png", arr=heatmap, cmap='RdBu', vmin=-heatmap.max(), vmax=heatmap.max())
 
 def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0.4):
+    ''' 
+    Creates and saves superimposed image for GradCAM visualization
+
+    args: 
+        img_path - filepath to input image
+        heatmap - array representing GradCAM heatmap
+        cam_path - filepath to write to
+        alpha - alpha value to use for blending images
+    '''
     # Load the original image
     img = Image.open(img_path).convert("RGBA").resize((244, 244))
 
@@ -142,7 +148,17 @@ def superimposed_gradcam(img_path, heatmap, cam_path="superimposed.png", alpha=0
 
 
 def make_gradcam_heatmap(img_path, model, last_conv_layer_name, pred_index=None):
+    '''
+    Makes and saves GradCAM heatmap of activations of last convolutional layer 
+
+    args: 
+        img_path - path to input image
+        model - model to create heatmap for 
+        last_conv_layer_name - name of the last convolutional layer of the model
     
+    returns:
+        Numpy array representing the heatmap
+    '''
     def get_img_array(img_path):
         img = tf.keras.preprocessing.image.load_img(img_path, target_size=(244, 244))
         # `array` is a float32 Numpy array of shape (299, 299, 3)
@@ -259,10 +275,11 @@ def main():
     # Run script from location of run.py
     os.chdir(sys.path[0])
 
-    datasets = TreepediaDataset(ARGS.data_gsv, ARGS.data_cityscapes)
+    datasets = GreenDataset(ARGS.data_gsv, ARGS.data_cityscapes)
 
    
     model, checkpoint_path, logs_path = None, None, None
+    # Use DeepGreen or DCNN model depending on program arguments
     if ARGS.deep_green:
         if ARGS.sequential:
             model = make_deep_green_seq_model(hp.img_size, hp.img_size)
@@ -277,9 +294,8 @@ def main():
                 "deep_green_model" + os.sep + timestamp + os.sep
             logs_path = "logs" + os.sep + "deep_green_model" + \
                 os.sep + timestamp + os.sep
-            
     else:
-        model = YourModel()
+        model = DCNNModel()
         model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
         checkpoint_path = "checkpoints" + os.sep + \
             "your_model" + os.sep + timestamp + os.sep
@@ -299,8 +315,8 @@ def main():
         os.makedirs(checkpoint_path)
 
     # Compile model graph
-
     if ARGS.sequential and ARGS.deep_green:
+        # compile Sequential model if flag set (only for DeepGreen)
         model.compile(
             optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
             loss=tf.keras.losses.MeanSquaredError(),
@@ -314,19 +330,13 @@ def main():
 
     if ARGS.evaluate:
         test(model, datasets.test_data)
-
-        # TODO: change the image path to be the image of your choice by changing
-        # the lime-image flag when calling run.py to investigate
-        # i.e. python run.py --evaluate --lime-image test/Bedroom/image_003.jpg
-        path = ARGS.data_gsv + os.sep + ARGS.lime_image
-        LIME_explainer(model, path, datasets.preprocess_fn)
     elif ARGS.lime_image or ARGS.gradcam_image:
         if ARGS.lime_image:
             lime_path = ARGS.lime_image
             LIME_explainer(model, lime_path)
         if ARGS.gradcam_image: 
             gradcam_path = ARGS.gradcam_image
-            # not sure if this will work
+            # set arguments for GradCAM visualization using DeepGreen
             last_conv_layer = "resnet50"
             if ARGS.deep_green: 
                 last_conv_layer = "conv5"

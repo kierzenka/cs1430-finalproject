@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.layers import \
-    Conv2D, MaxPool2D, Dropout, Flatten, Dense
+    Conv2D, MaxPool2D, Flatten, Dense
 import hyperparameters as hp
 
 class DeepGreenModel(tf.keras.Model): 
@@ -48,11 +48,11 @@ class DeepGreenModel(tf.keras.Model):
        return mse(labels, predictions)
 
 
-class YourModel(tf.keras.Model):
-    """ Your own neural network model. """
+class DCNNModel(tf.keras.Model):
+    """ Model based on Cai et. al paper which used pretrained ResNet model """
 
     def __init__(self):
-        super(YourModel, self).__init__()
+        super(DCNNModel, self).__init__()
 
         self.optimizer =tf.keras.optimizers.RMSprop(learning_rate=hp.learning_rate, momentum=hp.momentum)
 
@@ -81,7 +81,6 @@ class YourModel(tf.keras.Model):
         x = self.resnet(x)
         for layer in self.classification_head:
             x = layer(x)
-       #      print(x.shape)
 
         return x
 
