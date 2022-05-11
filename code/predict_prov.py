@@ -4,6 +4,8 @@ import glob
 import hyperparameters as hp
 from models import DCNNModel
 
+#This file is used to run our model against GSV images in providence
+
 def decode_image(img): 
     ''' 
     Convert the compressed string to a 3D float tensor
@@ -44,7 +46,6 @@ def process_file_line(img_path):
 model = DCNNModel()
 model(tf.keras.Input(shape=(hp.img_size, hp.img_size, 3)))
 
-
 # Load trained weights for DCNN model
 model.load_weights("/Users/alexkamper/Desktop/cs1430-finalproject/code/checkpoints/your_model/050822-201054/your.weights.e013-acc0.0888.h5",by_name=False)
 model.compile(
@@ -52,14 +53,14 @@ model.compile(
     loss=tf.keras.losses.MeanSquaredError(),
     metrics=["mean_absolute_error"])
 
-
+#load all of the image titles (which gives us the gsv panorama ids)
 cur_chunk = "Pnt_start1000_end2000"
-# filenames = glob.glob('../data/provData/prov_gsv_images/'+ cur_chunk + '/*.jpg')
 filenames = glob.glob("/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/provImages/"+cur_chunk+"/*.jpg")
 print(len(filenames))
 image_list = tf.stack(list(map(process_file_line, filenames)))
 panoIDs = [i.split("/")[-1][:-4] for i in filenames]
 
+#normalize images
 sample_size = 400
 rand_indices = np.floor(np.random.rand(sample_size)*image_list.shape[0])
                 #print(rand_indices[0:10])
@@ -71,9 +72,10 @@ stand = np.std(sample,axis=0)
 
 image_list = tf.map_fn(fn=lambda x: (x-mean)/stand, elems=image_list)
 
-
+#run model against all providence images
 output = model.predict(image_list, batch_size=32)
 
 with open("/Users/alexkamper/Desktop/cs1430-finalproject/data/provData/"+cur_chunk+"_labels.txt",'w') as f:
   for i in range(len(output)):
+    #write panorama ids and predicted GVI vals to a csv
     f.write(panoIDs[i]+","+str(output[i][0])+"\n")

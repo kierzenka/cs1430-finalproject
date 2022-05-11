@@ -1,0 +1,41 @@
+\begin{thebibliography}{1}
+
+\bibitem{Cai2019}
+Bill~Yang Cai, Xiaojiang Li, and Carlo Ratti.
+\newblock Quantifying urban canopy cover with deep convolutional neural
+  networks.
+\newblock {\em ArXiv}, abs/1912.02109, 2019.
+
+\bibitem{Heynen2006}
+Nik Heynen, Harold~A. Perkins, and Parama Roy.
+\newblock The political ecology of uneven urban green space.
+\newblock {\em Urban Affairs Review}, 42:25 -- 3, 2006.
+
+\bibitem{Li2015}
+Xiaojiang Li, Chuanrong Zhang, Wei Li, Robert~M. Ricard, Qingyan Meng, and
+  Weixing Zhang.
+\newblock Assessing street-level urban greenery using google street view and a
+  modified green view index.
+\newblock {\em Urban Forestry \& Urban Greening}, 14:675--685, 2015.
+
+\bibitem{Moreno}
+Marco~A. Moreno-Armendáriz, Hiram Calvo, Carlos~A. Duchanoy, Anayantzin~P.
+  López-Juárez, Israel~A. Vargas-Monroy, and Miguel~Santiago
+  Suarez-Castañon.
+\newblock Deep green diagnostics: Urban green space analysis using deep
+  learning and drone images.
+\newblock {\em Sensors}, 19(23), 2019.
+
+\bibitem{Seiferling}
+I.~Seiferling, N.~Naik, C.~Ratti, and R.~Proulx.
+\newblock Green streets − quantifying and mapping urban trees with
+  street-level imagery and computer vision.
+\newblock {\em Landscape and Urban Planning}, 164:93–--101, 2017.
+
+\bibitem{Yang2009}
+Jun Yang, J.~Yang, Linsen Zhao, Joe~Rayl McBride, and Peng Gong.
+\newblock Can you see green? assessing the visibility of urban forests in
+  cities.
+\newblock {\em Landscape and Urban Planning}, 91:97--104, 2009.
+
+\end{thebibliography}
